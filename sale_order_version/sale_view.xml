@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>        
+        <record id="view_order_form_add_versions" model="ir.ui.view">
+            <field name="name">sale.order.form.add_versions</field>
+            <field name="model">sale.order</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form/group[1]/group[1]/field[@name='client_order_ref']" position="after">
+                    <field name="sale_version_id" readonly="1" />
+                    <button 
+                        name="action_previous_version"
+                        string="Create version"
+                        type="object"
+                        icon="gtk-go-forward"
+                        colspan="2"
+                    />
+                </xpath>
+                <xpath expr="//form/group[1]/group[2]/field[@name='shipped']" position="after">
+                    <field name="active"/>
+                </xpath>
+                <page string="Other Information" position="after">
+                    <page string="Versions">
+                        <field name="version_ids" colspan="4" nolabel="1"/>
+                    </page>
+                </page>
+            </field>
+        </record>
+
+        <record id="view_order_tree_add_version_field" model="ir.ui.view">
+            <field name="name">sale.order.tree.add_version.field</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <field name="state" position="after">
+                    <field name="sale_version_id"/>
+                </field>
+            </field>
+        </record>
+        
+        <record id="view_sales_order_filter_edit" model="ir.ui.view">
+            <field name="name">sale.order.list.select_edit</field>
+            <field name="model">sale.order</field>
+            <field name="type">search</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <field name="user_id" position="after" >
+                    <newline/>
+                    <group expand="0" string="More options" colspan="11" col="11" groups="base.group_extended">
+                        <field name="active" />
+                    </group>
+                </field>
+                <filter string="Order Date" position="after">
+                    <filter string="Orig. Version" icon="terp-accessories-archiver" domain="[]" context="{'group_by':'sale_version_id'}"/>
+                </filter>
+            </field>
+        </record>
+    </data>
+</openerp>
