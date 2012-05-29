@@ -26,7 +26,9 @@
             Módulo que permite la creación de versiones de pedidos de ventas.
             Añade a los pedidos de ventas el campo activo, así como la referancia a la versión original del pedido de venta y el listado de versiones anteriores.
             Botón para realizar una nueva versión del pedido de venta, todo en la vista formulario.
-            Modifica el análisis de ventas para poder filtrar por pedidos de venta activos ( por defect ) e inactivos.
+            Modifica el análisis de ventas para poder filtrar por pedidos de venta activos ( por defecto ) e inactivos.
+            
+            El filtro por pedido de venta activo, no funciona en la web.
             
             """,
         "version" : "1.0",
