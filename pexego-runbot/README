@@ -1,0 +1,87 @@
+The OpenERP Runbot
+==================
+
+The OpenERP Runbot (or simply runbot) is a little program monitoring and
+running branches on Launchpad belonging to the different OpenERP projects,
+namely `openobject-server`, `openobject-addons`, `openobject-client-web`, and
+`openerp-web`. Doing so it generates a bunch of useful HTML reports.
+
+Initialy the goal was simply to have constantly an up-to-date (i.e. using the
+latest commits) running OpenERP server (with its associated web client) for
+testing and demoing purpose, for both the trunk and the stable (v6) branches.
+
+After a while, since installing some modules already performs some automatic
+tests, we changed a bit the runbot to also show on a web page if those tests
+passed or failed. Since then a few other changes were made (e.g. allow multiple
+Launchpad teams) but the overall goal is still the same.
+
+Installation
+------------
+
+Requirements:
+- python: werkzeug
+- python: simplejson
+- python: coverage
+- python: peewee
+- nginx
+- sqlite
+- git
+- bzr
+- hg
+
+Edit /etc/nginx/nginx.conf changing user by runbot's user
+Edit   /etc/postgresql/8.4/main/pg_hba.conf replacing:
+local   all         all                               md5 by  local   all         all                               trust
+or create a .pgpass file in runbot user's home folder with his postgresql password.
+
+Running the runbot
+------------------
+
+The runbot is a simple command-line tool. It doesn't do much in error reporting
+but its usage is straightforward. Running the following line (assuming the
+executable is on your path)
+
+  > openerp-runbot --help
+
+will provides most of the necessary detail.
+
+Typical usage resembles these lines:
+
+  > openerp-runbot --init
+  > openerp-runbot --run --number=100 --workers=4 --start-job-id=220
+  > openerp-runbot --clean
+
+The first line creates some directories to hold the different branches and
+copies of the code to be run, and some configuration files.
+
+The second line actually runs the runbot specifying we want a maximum of 100
+running OpenERP instances, 4 jobs at a time, and we want to number those jobs
+starting from 220 (this information should be kept across re-run in a file in
+the future).
+
+Hacking the runbot
+------------------
+
+The runbot is written in Python and is structured as follow. (It also uses
+nginx.)
+
+There are a main thread, a web server thread, and a limited number of worker
+threads. The main thread is stuck in an infinite loop performing the same
+things all over again:
+
+  - gather Launchpad branches information
+  - copy branches data and hand them over to (freshly started) worker threads
+  - copy worker results for reporting
+  - kill older running OpenERP instances
+  - update some web pages and json files
+  - communicate with the web server (using a file and a command queue)
+
+(See the `loop()` method of the `RunBot` class in `openerprunbot.core`.)
+
+The data structures are mostly copies of the branches data. The `RunBot` class
+contains all the globals (together with `openerprunbot.__init__`, this should
+be cleaned).  The `RunBotBranch` is the base branch data itself. The
+`RunBotGroupedBranch` regroups the branches of the different OpenERP project
+sharing the same name (e.g. the trunk for the server, addons, client-web, and
+web).  The `Job` class is a copy of those data given to worker threads. Finally
+the `Point` class is a job result, used for reporting.
