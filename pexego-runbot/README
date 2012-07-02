@@ -29,10 +29,13 @@ Requirements:
 - bzr
 - hg
 
-Edit /etc/nginx/nginx.conf changing user by runbot's user
+Edit /etc/nginx/nginx.conf changing user by runbot's user and user group
 Edit   /etc/postgresql/8.4/main/pg_hba.conf replacing:
 local   all         all                               md5 by  local   all         all                               trust
 or create a .pgpass file in runbot user's home folder with his postgresql password.
+
+After, reiniciate postgres with:
+sudo /etc/init.d/postgresql restart
 
 Running the runbot
 ------------------
@@ -47,9 +50,9 @@ will provides most of the necessary detail.
 
 Typical usage resembles these lines:
 
-  > openerp-runbot --init
-  > openerp-runbot --run --number=100 --workers=4 --start-job-id=220
-  > openerp-runbot --clean
+  > openerp-runbot.py --init
+  > openerp-runbot.py --run
+  > openerp-runbot.py --clean
 
 The first line creates some directories to hold the different branches and
 copies of the code to be run, and some configuration files.

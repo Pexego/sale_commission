@@ -25,6 +25,9 @@ class Addon(BaseModel):
     project = ForeignKeyField(Project, related_name='addons')
     brancheable = BooleanField()
     custom = BooleanField()
+
+    class Meta:
+        ordering = ('number')
     
 class Download(BaseModel):
     project = ForeignKeyField(Project, related_name='downloads')
@@ -42,4 +45,3 @@ def create_tables():
     if not Download.table_exists():
         Download.create_table()
     
-create_tables()
