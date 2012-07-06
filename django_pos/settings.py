@@ -184,11 +184,11 @@ LOGGING = {
 
 #OpenERP connector conf
 ENABLE_ERP = True
-ERP_CONF = "/home/alejandro/Proyectos/nadela/django_pos/pos/openerp-server.conf"
-ERP_PATH = "/home/alejandro/Proyectos/openerp/6.1/server/"
-ERP_UN = 'admin'
-ERP_PW = 'admin'
-ERP_DB = 'pos_dev'
+ERP_CONF = ""
+ERP_PATH = ""
+ERP_UN = ""
+ERP_PW = ""
+ERP_DB = ""
 
 # Dajax
 DAJAXICE_MEDIA_PREFIX="dajaxice"
