@@ -8,6 +8,7 @@ dajax  -> http://www.dajaxproject.com/
 dajaxice -> http://www.dajaxproject.com/
 inplaceeditform -> http://pypi.python.org/pypi/django-inplaceedit/0.83
 
+Para que funcione correctamente inplaceeditform, se modifica un template.
 
 Es necesario modificar en el fichero settings.py las siguientes líneas:
 
@@ -25,6 +26,10 @@ db_port = False # Puerto del servidor
 db_user = openerp # Usuario de PostgreSQL
 db_password = openerp # Contraseña del usuario de PostgreSQL
 addons_path = RUTA de nuestros módulos, localización española, addons, web addons y otros módulos que podamos necesitar, para precargarlos en la aplicación.
+
+
+Esta aplicación esta testeada con Django 1.3.1
+Para el correcto funcionamiento hay que cambiar el fichero django/utils/module_loading.py ( se adjunta )
 
 
 Saludos.
