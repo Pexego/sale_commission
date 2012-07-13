@@ -1,0 +1,78 @@
+{% extends "pos/base.html" %}
+{% load i18n %}
+{% block js %}
+    <style type="text/css">
+        @import "{{ STATIC_URL }}css/jquery.keypad.css";
+    </style>
+    <script src="{{ STATIC_URL }}js/jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.keypad.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.keypad-es.js"></script>
+    <script type="text/javascript">
+            $(function () {
+                
+                $('#pagado').keypad({layout: ['123' + $.keypad.CLOSE, '456' + $.keypad.CLEAR, '789' + $.keypad.BACK, '0' + $.keypad.COMA]});
+            });
+        </script>
+{% endblock js%}
+{% block inicio %}
+
+<div style="margin:auto;width:60%;">
+    {% if pos_order %}
+    <div class="pos-payment-container" style="background-color:white;">
+        <table>
+            <thead>
+                <tr>
+                        <td>Producto/s</td>
+                        <td>Precio</td>
+                        <td>Cantidad</td>
+                        <td>% Descuento</td>
+                        <td>Total</td>
+                </tr>
+            </thead>
+            <tbody id="current-order-content">
+                {% for p in pos_order.products %}
+                    <tr>
+                        <td>{{ p.product_name }}</td>
+                        <td>{{ p.precio|floatformat:2 }} &euro;</td>
+                        <td>{{ p.cantidad }}</td>
+                        <td>{{ p.descuento }}</td>
+                        <td>{{ p.total|floatformat:2 }} &euro;</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td><strong>TOTAL</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>{{ pos_order.total|floatformat:2 }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <form action="." method="post">{% csrf_token %}
+        <h3>Dinero entregado por el cliente: <br /><input name="pagado" value="{{ pagado }}" id="pagado" type="text"></h3>
+        <h3>Vueltas: <br /><strong>{{ result|floatformat:2 }} &euro;</strong></h3>       
+        <input type="Submit" name="caculate" value="Calcular Vueltas!" id="caculate" />
+    </form>
+    <br /><br />
+    <div class="pos-payment-buttons">
+        <a href="{% url place mesa %}">
+            <button class="oe-back-to-products">
+                <img src="{{ STATIC_URL }}/img/gtk-go-back.png">
+            Back to Products</button>
+        </a>
+        {% if result %}
+        {% if result > 0.0 %}
+        <a href="{% url validar mesa tipo %}">
+            <button id="validate-order">
+                <img src="{{ STATIC_URL }}/img/gtk-apply.png">
+            Validate</button>
+        </a>
+        {% endif %}
+        {% endif %}
+    </div>
+    {% else %}
+        {% trans "No hay mesas ni barras" %}
+    {% endif %}
+</div>
+{% endblock inicio %}

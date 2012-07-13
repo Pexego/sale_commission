@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>        
+        <record id="view_pos_pos_form_restaurant" model="ir.ui.view">
+            <field name="name">pos.order_versions</field>
+            <field name="model">pos.order</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+            <field name="arch" type="xml">
+                <page string="Extra Info" position="after">
+                    <page string="Mesa/Barra/Terraza">
+                        <field name="place_id"/>
+                    </page>
+                </page>
+            </field>
+        </record>
+        
+         <!-- Restaurant -->
+        <record id="pos_restaurant_place_form_view" model="ir.ui.view">
+            <field name="name">pos.place.form</field>
+            <field name="model">pos.place</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="PoS Restaurant Place">
+                    <group colspan="4" col="6">
+                        <field name="name"/>
+                        <field name="price_increase" />
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record id="pos_restaurant_place_tree_view" model="ir.ui.view">
+            <field name="name">pos.place.tree</field>
+            <field name="model">pos.place</field>
+            <field name="type">tree</field>
+            <field name="field_parent" eval="False"/>
+            <field name="arch" type="xml">
+                <tree string="PoS Restaurant Place">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="pos_restaurant_place_action" model="ir.actions.act_window">
+            <field name="name">PoS Restaurant Place</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">pos.place</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem action="pos_restaurant_place_action" 
+        id="menu_pos_restaurant_place" 
+        parent="point_of_sale.menu_point_config_product" sequence="40" />
+        
+    </data>
+</openerp>

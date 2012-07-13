@@ -1,0 +1,27 @@
+{% extends "pos/base.html" %}
+{% load i18n %}
+{% block inicio %}
+    {% if places %}
+        <ol>
+              {% for each in places %}
+                <li class="product-barra"><a href="{% url place each.id %}">
+                    <div class="product-img-barra">
+                        {% if each.name = "Barra" %}
+                         <img alt="{{ each.name }}" src="{{ STATIC_URL }}img/barra.jpg" />
+                        {% else %}
+                         <img alt="{{ each.name }}" src="{{ STATIC_URL }}img/mesa.jpg" />
+                        {% endif %}
+                        {% if each.id in ocupadas %}
+                            <span class="price-tag">{% trans "OCUPADA" %}</span>
+                        {% endif %}
+                    </div>
+                    <div class="product-name">
+                        {{ each.name }}
+                    </div></a>
+                </li>
+              {% endfor %}
+        </ol>
+    {% else %}
+        {% trans "No hay mesas ni barras" %}
+    {% endif %}
+{% endblock inicio %}

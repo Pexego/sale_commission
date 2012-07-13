@@ -1,0 +1,141 @@
+{% extends "pos/base.html" %}
+{% load i18n postags %}
+{% load inplace_edit %}
+{% block js %}
+    <style type="text/css">
+        @import "{{ STATIC_URL }}css/jquery.keypad.css";
+    </style>
+    <script src="{{ STATIC_URL }}js/jquery-1.7.2.min.js" type="text/javascript"></script>
+    {% inplace_media %}
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.keypad.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.keypad-es.js"></script>
+    <script type="text/javascript">
+
+        function my_callback(data){
+            window.location.reload()
+        }
+    </script>
+{% endblock %}
+{% block izquierda %}
+    <div id="current-order">
+        <table>
+            <thead>
+                <tr>
+                    <td>Producto</td>
+                    <td>Precio</td>
+                    <td>Descuento (%)</td>
+                    <td>Cantidad</td>
+                    <td>Total</td>
+                </tr>
+            </thead>
+            <tbody id="current-order-content">
+                {% for p in pos_order.products %}
+                    <tr>
+                        <td>{{ p.product_name }}</td>
+                        <td>{{ p.precio }} &euro;</td>
+                        <td>{% inplace_edit "p.descuento|floatformat:2" auto_height=1, auto_width=1 %}</td>
+                        <td>{% inplace_edit "p.cantidad" auto_height=1, auto_width=1 %}</td>
+                        <td>{{ p.total|floatformat:2 }} &euro;</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <ul id="amounts">
+            <li>
+                Total:
+                <span id="total">{{ pos_order.total|floatformat:2 }} &euro;</span>
+            </li>
+        </ul>
+        <div id="paypad">
+            {% for p in metodos_pago %}
+                <a href="{% url pagar mesa p.journal_id.id %}">
+                    <button cash-register-id="6" class="payment-button">
+                        {{ p.journal_id.name }}
+                    </button>
+                </a>
+                <br>
+            {% endfor %}
+        </div>
+        {% comment %}
+        <div id="numpad">
+            <button class="input-button number-char">1</button>
+            <button class="input-button number-char">2</button>
+            <button class="input-button number-char">3</button>
+            <button class="mode-button" data-mode='quantity'>Cant</button>
+            <br />
+            <button class="input-button number-char">4</button>
+            <button class="input-button number-char">5</button>
+            <button class="input-button number-char">6</button>
+            <button class="mode-button" data-mode='discount'>Des</button>
+            <br />
+            <button class="input-button number-char">7</button>
+            <button class="input-button number-char">8</button>
+            <button class="input-button number-char">9</button>
+            <button class="mode-button" data-mode='list_price'>Precio</button>
+            <br />
+            <button class="input-button" id="numpad-minus" >+/-</button>
+            <button class="input-button number-char">0</button>
+            <button class="input-button number-char">.</button>
+            <button class="input-button" id="numpad-backspace">
+                <img src="{{ STATIC_URL }}img/backspace.png" width="24" height="21" />
+            </button>
+            <br />
+        </div>
+        {% endcomment %}
+    </footer>
+{% endblock izquierda %}
+{% block derecha %}
+
+{% if products %}
+    <div class="step-screen selected-step" id="products-screen" style="display: block;">
+        <div id="products-screen-categories">
+            <header>
+                <ol class="breadcrumb">
+                    <li class="oe-pos-categories-list">
+                        <a href="/">
+                            <img class="homeimg" src="{{ STATIC_URL }}img/home.png">
+                        </a>
+                    </li>
+                </ol>
+                {% comment %}
+                <div class="searchbox">
+                    <input placeholder="Search Products">
+                    <img src="{{ STATIC_URL }}img/search_reset.gif" class="search-clear">
+                </div>
+                {% endcomment %}
+            </header>
+            <div id="categories" style="margin-left:5px;">
+                {% regroup products by pos_categ_id as categories_list %}
+                <ol>
+                    {% for category in categories_list %} 
+                    <li class="oe-pos-categories-list">
+                        <a class="button" href="{% url category mesa category.grouper.id %}">
+                        <strong>{{ category.grouper.name }}</strong></a>
+                    </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+        <ol class="product-list" id="products-screen-ol" style="top: 150px;">
+          {% for each in products %}
+            <li class="product">
+                <a href="#" onclick="Dajaxice.pos.add_product_to_order_line(my_callback, {'product_id':{{ each.id }}, 'product_name':'{{ each.name }}', 'price':'{{ each.lst_price }}', 'mesa':'{{ mesa }}' });">
+                    <div class="product-img">
+                         <img alt="{{ each.name }}" src="data:image/png;base64,{{ each.product_image_small }}" />
+                         <span class="price-tag">{{ each.lst_price }} &euro;</span>
+                    </div>
+                    <div class="product-name">
+                        {{ each.name }}
+                    </div>
+                </a>
+            </li>
+          {% endfor %}
+        </ol>
+    </div>
+{% else %}
+    {% trans "No hay productos" %}
+{% endif %}
+{% endblock derecha %}
