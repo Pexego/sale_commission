@@ -1,0 +1,81 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+#	* employees_bom
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 6.0.3\n"
+"Report-Msgid-Bugs-To: support@openerp.com\n"
+"POT-Creation-Date: 2012-01-03 11:34+0000\n"
+"PO-Revision-Date: 2012-01-03 12:35+0100\n"
+"Last-Translator: Marta <marta@pexego.es>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+
+#. module: employees_bom
+#: sql_constraint:mrp.bom:0
+msgid ""
+"All product quantities must be greater than 0.\n"
+"You should install the mrp_subproduct module if you want to manage extra products on BoMs !"
+msgstr ""
+"Todas las cantidades de producto deben de ser superiores a cero.\n"
+"¡Debe instalar el módulo mrp_subproduct si quiere gestionar productos extra en las LdM!"
+
+#. module: employees_bom
+#: constraint:mrp.bom:0
+msgid "Error ! You can not create recursive BoM."
+msgstr "¡Error! No puede crear Listas de Material recursivas."
+
+#. module: employees_bom
+#: view:mrp.bom:0
+msgid "Manpower"
+msgstr "Mano de obra"
+
+#. module: employees_bom
+#: model:ir.model,name:employees_bom.model_mrp_production
+msgid "Manufacturing Order"
+msgstr "Órden de producción"
+
+#. module: employees_bom
+#: field:mrp.bom,employees_ids:0
+msgid "Employees"
+msgstr "Empleados"
+
+#. module: employees_bom
+#: constraint:hr.employee:0
+msgid "Error ! You cannot select a department for which the employee is the manager."
+msgstr "¡Error! No puede seleccionar un departamento para el cual el empleado sea el director."
+
+#. module: employees_bom
+#: model:ir.model,name:employees_bom.model_mrp_bom
+msgid "Bill of Material"
+msgstr "Lista de material"
+
+#. module: employees_bom
+#: field:hr.employee,bom_id:0
+msgid "BoM"
+msgstr "BoM"
+
+#. module: employees_bom
+#: view:mrp.bom:0
+msgid "Components"
+msgstr "Componentes"
+
+#. module: employees_bom
+#: model:ir.model,name:employees_bom.model_hr_employee
+msgid "Employee"
+msgstr "Empleado"
+
+#. module: employees_bom
+#: constraint:mrp.production:0
+msgid "Order quantity cannot be negative or zero !"
+msgstr "¡Cantidad ordenada no puede ser negativa o cero!"
+
+#. module: employees_bom
+#: constraint:hr.employee:0
+msgid "Error ! You cannot create recursive Hierarchy of Employees."
+msgstr "¡Error! No se puede crear una jerarquía recursiva de empleados."
+

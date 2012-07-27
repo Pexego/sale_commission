@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+
+        <!-- adds fields to production lot form-->
+
+        <record model="ir.ui.view" id="view_move_form">
+            <field name="name">stock.production.lot.form.inherit</field>
+            <field name="model">stock.production.lot</field>
+            <field name="inherit_id" ref="stock.view_production_lot_form" />
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <field name="date" position="before">
+                    <field name="unit_price"/>
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_move_form_inherit2">
+            <field name="name">stock.production.lot.form.inherit2</field>
+            <field name="model">stock.production.lot</field>
+            <field name="inherit_id" ref="stock.view_production_lot_form" />
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <field name="product_id" position="replace">
+                    <field name="product_id" on_change="on_change_product_id(product_id)"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- adds unit_price to prodlots tree view-->
+
+        <record id="view_production_lot_tree" model="ir.ui.view">
+            <field name="name">stock.production.lot.tree.inherit</field>
+            <field name="model">stock.production.lot</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+            <field name="arch" type="xml">
+                <field name="product_id" position="after">
+                    <field name="unit_price"/>
+                </field>
+            </field>
+        </record>
+
+
+    </data>
+</openerp>

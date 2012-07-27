@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">    
+      <record id="location_mix" model="stock.location">
+            <field name="name">Mix</field>
+            <field name="location_id" ref="stock.stock_location_locations_virtual"/>
+            <field name="usage">intermediate</field>
+      </record>
+    
+	<record forcecreate="True" id="property_raw" model="ir.property">
+            <field name="name">property_raw</field>
+            <field name="fields_id" search="[('model','=','product.template'),('name','=','property_raw')]"/>
+            <field eval="'stock.location,'+str(ref('stock.stock_location_stock'))" name="value"/>
+        </record>
+	
+	<record forcecreate="True" id="property_mix" model="ir.property">
+            <field name="name">property_mix</field>
+            <field name="fields_id" search="[('model','=','product.template'),('name','=','property_mix')]"/>
+            <field eval="'stock.location,'+str(location_mix)" name="value"/>
+        </record>
+    </data>
+</openerp>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <record id="lock_extra_lot_recursively_wzd_form" model="ir.ui.view">
+            <field name="name">lock.extra.production.lot.recursively.wzd.form</field>
+            <field name="model">lock.extra.production.lot.recursively</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Add Production Lot to Blockade Case">
+                    <separator colspan="4" string="Add specific production lot recursively upstream and downstream in Blockade Case" />
+                    <field name="case_id" colspan="2"/>
+                    <newline/>
+                    <field name="prodlot_id"/>
+                    <field name="firmness_grade"/>
+                    <button special="cancel" string="Cancel" icon="gtk-cancel"/>
+                    <button name="lock_production_lot" type="object" icon="gtk-execute" string="Block"/>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</openerp>

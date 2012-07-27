@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <record id="mrp_bom_form_view_add_eval_fields" model="ir.ui.view">
+            <field name="name">mrp.bom.form.add_eval_fields</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <field name="product_uom" position="after">
+                    <field name="eval_type"/>
+                    <field name="formula" attrs="{'invisible':[('eval_type','=','fixed')]}"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="mrp_bom_form_view_add_seq_to_components" model="ir.ui.view">
+            <field name="name">mrp.bom.form.add_seq_to_components</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp_bom_form_view_add_eval_fields"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook/page[@string='Components']/field[@name='bom_lines']/tree/field[@name='product_id']" position="before">
+                    <field name="sequence" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_bom_form_view_add_formula" model="ir.ui.view">
+            <field name="name">mrp.bom.form.add_formula</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp_bom_form_view_add_seq_to_components"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook/page[@string='Components']/field[@name='bom_lines']/tree/field[@name='product_uom']" position="after">
+                    <field name="formula"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_bom_form_view_add_eval_type" model="ir.ui.view">
+            <field name="name">mrp.bom.form.add_eval_type</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp_bom_form_view_add_formula"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook/page[@string='Components']/field[@name='bom_lines']/tree/field[@name='product_id']" position="after">
+                    <field name="eval_type"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_bom_form_view_add_eval_fields_form" model="ir.ui.view">
+            <field name="name">mrp.bom.form.add_eval_fields_form</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp_bom_form_view_add_eval_type"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook/page[@string='Components']/field[@name='bom_lines']/form/group[1]/field[@name='product_uom']" position="after">
+                    <field name="eval_type"/>
+                    <field name="formula" attrs="{'invisible':[('eval_type','=','fixed')]}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_bom_form_view_seq_readonly_form" model="ir.ui.view">
+            <field name="name">mrp.bom.form.seq_readonly_form</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp_bom_form_view_add_eval_fields_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook/page[@string='Components']/field[@name='bom_lines']/form/group[2]/notebook/page[@string='Properties']/field[@name='sequence']" position="replace">
+                    <field name="sequence" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_bom_form_view_add_seq_to_components_in" model="ir.ui.view">
+            <field name="name">mrp.bom.form.add_seq_to_components_in</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp_bom_form_view_seq_readonly_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook/page[@string='Components']/field[@name='bom_lines']/form/group[2]/notebook/page[@string='Components']/field[@name='bom_lines']/tree/field[@name='product_id']" position="before">
+                    <field name="sequence" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_bom_form_view_add_formula_to_components" model="ir.ui.view">
+            <field name="name">mrp.bom.form.add_formula_to_components</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp_bom_form_view_add_seq_to_components_in"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook/page[@string='Components']/field[@name='bom_lines']/form/group[2]/notebook/page[@string='Components']/field[@name='bom_lines']/tree/field[@name='product_uom']" position="after">
+                    <field name="formula"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_bom_form_view_add_eval_type_to_components" model="ir.ui.view">
+            <field name="name">mrp.bom.form.add_eval_type_to_components</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp_bom_form_view_add_formula_to_components"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook/page[@string='Components']/field[@name='bom_lines']/form/group[2]/notebook/page[@string='Components']/field[@name='bom_lines']/tree/field[@name='product_id']" position="after">
+                    <field name="eval_type"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_bom_form_view_add_note" model="ir.ui.view">
+            <field name="name">mrp.bom.form.add_note</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp_bom_form_view_add_eval_type_to_components"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook" position="after">
+                    <label string="Evaluations: P: production quantity, C(Line seq.): Qty of line's product in production, A(Line seq.): Alcoholic grade of line's product lot in production. (A2,C1,C2,A3)"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="mrp_bom_tree_view_add_eval_fields" model="ir.ui.view">
+            <field name="name">mrp.bom.tree.add_eval_fields</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
+            <field name="type">tree</field>
+            <field name="field_parent">child_complete_ids</field>
+            <field name="arch" type="xml">
+                <field name="product_uom" position="after">
+                    <field name="eval_type"/>
+                    <field name="formula"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="mrp_bom_component_tree_view_add_eval_fields" model="ir.ui.view">
+            <field name="name">mrp.bom.component.tree.add_eval_fields</field>
+            <field name="model">mrp.bom</field>
+            <field name="inherit_id" ref="mrp.mrp_bom_component_tree_view"/>
+            <field name="type">tree</field>
+            <field name="field_parent">child_complete_ids</field>
+            <field name="arch" type="xml">
+                 <field name="product_uom" position="after">
+                    <field name="eval_type"/>
+                    <field name="formula"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+         <record id="sequence_view_add_key" model="ir.ui.view">
+            <field name="name">ir.sequence.form.add_key</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <xpath expr="//page[@string='Configuration']" position="inside">
+                    <separator string="Keyword" colspan="4"/>
+                    <field name="keyword"/>
+               </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

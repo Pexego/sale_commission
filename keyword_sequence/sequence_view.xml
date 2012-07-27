@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+      
+          <record id="sequence_view_add_label" model="ir.ui.view">
+            <field name="name">ir.sequence.form.add_label</field>
+            <field name="model">ir.sequence</field>
+            <field name="inherit_id" ref="base.sequence_view"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook/page[@string='Sequence']/group/group[1]/label[@string='Day: %%(day)s']" position="after">
+                    <label colspan="4" string="Current Year without Century - keyword: %%(kw_year)s"/>
+                    <label colspan="4" string="Current Month - keyword: %%(kw_month)s"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>
