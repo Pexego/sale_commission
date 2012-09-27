@@ -93,7 +93,6 @@ class block_production_lot(osv.osv_memory):
                 'view_mode': 'tree,form',
                 'res_model': 'block.prodlot.cases',
                 'type': 'ir.actions.act_window',
-                'view_id': (view_id, 'View'),
                 'domain': [('id', '=', blockade_id)],
                 'nodestroy':True
             }
