@@ -6,7 +6,7 @@
             id="sale.report_sale_order"
             model="sale.order"
             name="sale.order"
-            rml="pxgo_early_payment_discount/report/order.rml"
+            rml="sale_early_payment_discount/report/order.rml"
             string="Quotation / Order"/>
 
     </data>
