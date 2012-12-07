@@ -21,6 +21,7 @@
 
 # Django settings for project.
 import os, sys
+#import re
 
 gettext = lambda s: s
 
@@ -116,12 +117,14 @@ SECRET_KEY = '#-^%k1^n_z%8-m(o72pamyv+ar3-n9sxa-df_fy$pcn^u^kb7%'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
+
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
+    #'devserver.middleware.DevServerMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -154,9 +157,10 @@ INSTALLED_APPS = (
     'dajax',
     'dajaxice',
     'inplaceeditform',
-
+    #'devserver',
+    
     #Mis apps
-    'pos',    
+    'pos', 
 )
 
 # A sample logging configuration. The only tangible logging
@@ -186,9 +190,9 @@ LOGGING = {
 ENABLE_ERP = True
 ERP_CONF = ""
 ERP_PATH = ""
-ERP_UN = ""
-ERP_PW = ""
-ERP_DB = ""
+ERP_UN = ''
+ERP_PW = ''
+ERP_DB = ''
 
 # Dajax
 DAJAXICE_MEDIA_PREFIX="dajaxice"
@@ -205,3 +209,17 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 #Editor en linea:
 INPLACEEDIT_EDIT_EMPTY_VALUE = '0,0'
+
+#Cache
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/home/alejandro/Proyectos/nadela/django_pos/tmp/django_cache',
+        'TIMEOUT': 900,
+        'OPTIONS': {
+            'MAX_ENTRIES': 500
+        }
+    }
+}
+

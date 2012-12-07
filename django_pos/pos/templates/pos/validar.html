@@ -9,7 +9,6 @@
     <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.keypad-es.js"></script>
     <script type="text/javascript">
             $(function () {
-                
                 $('#pagado').keypad({layout: ['123' + $.keypad.CLOSE, '456' + $.keypad.CLEAR, '789' + $.keypad.BACK, '0' + $.keypad.COMA]});
             });
         </script>
@@ -50,26 +49,27 @@
         </table>
     </div>
     <form action="." method="post">{% csrf_token %}
-        <h3>Dinero entregado por el cliente: <br /><input name="pagado" value="{{ pagado }}" id="pagado" type="text"></h3>
-        <h3>Vueltas: <br /><strong>{{ result|floatformat:2 }} &euro;</strong></h3>       
+        <h3>Dinero entregado por el cliente: <br /><input name="pagado" value="" id="pagado" type="text"></h3>
+        <h3>Vueltas: <br /><strong>{{ result|floatformat:2 }} &euro;</strong></h3>  
         <input type="Submit" name="caculate" value="Calcular Vueltas!" id="caculate" />
     </form>
     <br /><br />
+    <a href="{% url imprimir_prefactura pos_order.id mesa tipo %}">
+            <button id="validate-order">
+                <img src="{{ STATIC_URL }}/img/gtk-apply.png">
+            Imprimir ticket</button>
+    </a><br />
     <div class="pos-payment-buttons">
         <a href="{% url place mesa %}">
             <button class="oe-back-to-products">
                 <img src="{{ STATIC_URL }}/img/gtk-go-back.png">
             Back to Products</button>
         </a>
-        {% if result %}
-        {% if result > 0.0 %}
-        <a href="{% url validar mesa tipo %}">
-            <button id="validate-order">
-                <img src="{{ STATIC_URL }}/img/gtk-apply.png">
-            Validate</button>
-        </a>
-        {% endif %}
-        {% endif %}
+                <a href="{% url validar mesa tipo %}">
+                    <button id="validate-order">
+                        <img src="{{ STATIC_URL }}/img/gtk-apply.png">
+                    Validar pago</button>
+                </a>
     </div>
     {% else %}
         {% trans "No hay mesas ni barras" %}

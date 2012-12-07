@@ -5,5 +5,11 @@
     <p><a href="/">
         <button cash-register-id="6" class="payment-button">
         Inicio
-        </button></a></p>
+        </button></a> 
+        <a href="{% url imprimir pos_order.id %}">
+            <button id="validate-order">
+                <img src="{{ STATIC_URL }}/img/gtk-apply.png">
+            Imprimir ticket</button>
+        </a>
+    </p>
 {% endblock inicio %}

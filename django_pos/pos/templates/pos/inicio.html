@@ -1,7 +1,19 @@
 {% extends "pos/base.html" %}
 {% load i18n %}
 {% block inicio %}
+    <header>
+        <ol class="breadcrumb">
+            <li class="oe-pos-categories-list">
+                <a href="/">
+                    <img class="homeimg" src="{{ STATIC_URL }}img/home.png">
+                </a>
+            </li>
+        </ol>                
+    </header>
+    
+    <div style="clear:both;"></div>
     {% if places %}
+    <br >
         <ol>
               {% for each in places %}
                 <li class="product-barra"><a href="{% url place each.id %}">

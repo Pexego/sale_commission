@@ -1,0 +1,35 @@
+{% extends "pos/base.html" %}
+{% load i18n %}
+{% block inicio %}
+<div style="margin:auto;width:40%;">
+        <ol>
+            <li>
+              <a href="{% url home 0 %}">
+                    <div class="product-img-barra">
+                         <img alt="{% trans "Cafetería" %}" src="{{ STATIC_URL }}img/mesa.jpg" />
+                            <span class="price-tag">{% trans "Cafetería" %}</span>
+                    </div>
+<!--
+                    <div class="product-name">
+                        {% trans "Cafetería" %}
+                    </div>
+-->
+                    </a>
+                </li>
+                <li><br /></li>
+                <li>
+              <a href="{% url home 1 %}">
+                    <div class="product-img-barra">
+                         <img alt="{% trans "Restaurante" %}" src="{{ STATIC_URL }}img/mesa.jpg" />
+                            <span class="price-tag">{% trans "Restaurante" %}</span>
+                    </div>
+<!--
+                    <div class="product-name">
+                        {% trans "Restaurante" %}
+                    </div>
+-->
+                    </a>
+                </li>
+        </ol>
+        </div>
+{% endblock inicio %}

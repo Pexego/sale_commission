@@ -22,9 +22,10 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="PoS Restaurant Place">
-                    <group colspan="4" col="6">
+                    <group colspan="2" col="6">
                         <field name="name"/>
                         <field name="price_increase" />
+                        <field name="location_table" />
                     </group>
                 </form>
             </field>
@@ -38,6 +39,36 @@
                 <tree string="PoS Restaurant Place">
                     <field name="name"/>
                 </tree>
+            </field>
+        </record>
+        
+        <record id="product_normal_form_pos_view" model="ir.ui.view">
+            <field name="name">product.normal.pos.form.inherit</field>
+            <field name="model">product.product</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                  <group name="status" position="after">
+                      <group colspan="2" col="2" name="pos">
+                          <separator string="Point-of-Sale" colspan="2"/>
+                          <field name="pos_categ_id"/>
+                          <field name="favorite"/>
+                      </group>
+                  </group>
+            </field>
+        </record>
+        
+        <record id="res_users_form_pos_view" model="ir.ui.view">
+            <field name="name">res.users.form.pos.inherit</field>
+            <field name="model">res.users</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <page string="User" position="after">
+                    <page string="Opciones POS">
+                        <field name="cancel_code" />
+                    </page>
+                </page>
             </field>
         </record>
         

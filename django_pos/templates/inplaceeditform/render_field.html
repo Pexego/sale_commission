@@ -7,7 +7,12 @@
                 $('#{{ field.auto_id }}').keypad({layout: ['123' + $.keypad.CLOSE, '456' + $.keypad.CLEAR, '789' + $.keypad.BACK, '0' + $.keypad.COMA]});
             });
         </script>
-        <input type="text" id="{{ field.auto_id }}" value="{{ field.value }}" name="{{ field.auto_id }}" style="">        <span class="field_id" style="display:none">{{ field.auto_id }}</span>
+        {% if field.value == 0.0 %}
+            <input type="text" id="{{ field.auto_id }}" value="" name="{{ field.auto_id }}" style="">        <span class="field_id" style="display:none">{{ field.auto_id }}</span>
+        {% else %}
+            <input type="text" id="{{ field.auto_id }}" value="{{ field.value }}" name="{{ field.auto_id }}" style="">        <span class="field_id" style="display:none">{{ field.auto_id }}</span>
+        {% endif %}
+        
         {% block actions %}
             {% block apply %}
                 <button class="apply {% block classapply %}{% endblock %}" title="{% trans "Apply change" %}" type="button">

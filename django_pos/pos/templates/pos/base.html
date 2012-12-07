@@ -1,5 +1,4 @@
 {% load i18n %}
-{% load dajaxice_templatetags %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="http://www.facebook.com/2008/fbml" lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -7,11 +6,10 @@
     {% block css %}
         <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/pos.css" />
     {% endblock css %}
-    {% block js %}
-    {% endblock js%}
-    {% dajaxice_js_import %}
+    
 </head>
     <body>
+        
         <div class="point-of-sale">
             {% block inicio %}
                 <div id="leftpane">
@@ -24,5 +22,7 @@
                 </div>
             {% endblock inicio %}
         </div>
+        {% block js %}
+        {% endblock js%}
     </body>
 </html>
