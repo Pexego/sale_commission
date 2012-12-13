@@ -17,6 +17,10 @@ except ImportError:
 
 
 def get_dict_from_obj(obj):
+    '''
+    Edit to get the dict even when the object is a GenericRelatedObjectManager.
+    Added the try except.
+    '''
     obj_dict = obj.__dict__
     obj_dict_result = obj_dict.copy()
     for key, value in obj_dict.items():
@@ -31,7 +35,7 @@ def get_dict_from_obj(obj):
                 pass
     manytomany_list = obj._meta.many_to_many
     for manytomany in manytomany_list:
-        ids = [obj_rel.id for obj_rel in manytomany.value_from_object(obj)]
+        ids = [obj_rel.id for obj_rel in manytomany.value_from_object(obj).select_related()]
         if ids:
             obj_dict_result[manytomany.name] = ids
     return obj_dict_result
@@ -93,7 +97,7 @@ def get_adaptor_class(adaptor=None, obj=None, field_name=None):
         return get_adaptor_class(obj=obj, field_name=field_name)
     elif not path_adaptor:
         return BaseAdaptorField
-    path_module, class_adaptor = ('.'.join(path_adaptor.split('.')[:-1]), path_adaptor.split('.')[-1])
+    path_module, class_adaptor = ('.'.join(path_adaptor.split('.')[:-1]), path_adaptor.split('.')[-1])    
     return getattr(import_module(path_module), class_adaptor)
 
 
@@ -103,3 +107,11 @@ def get_static_url(subfix='inplaceeditform'):
         return static_url
     else:  # To old django versions
         return '%s%s/' % (getattr(settings, 'MEDIA_URL', None), subfix)
+
+
+def get_admin_static_url():
+    """
+    Return the ADMIN_MEDIA_PREFIX if it is in the settings.py else get
+    the static url from the previous function and add /admin/.
+    """
+    return getattr(settings, 'ADMIN_MEDIA_PREFIX', get_static_url() + "admin/")

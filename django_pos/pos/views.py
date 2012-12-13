@@ -25,6 +25,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
 from pos import models as posmodels
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 
 def search(request, mesa):
     query = request.GET.get('q', '')
@@ -64,7 +65,7 @@ def search(request, mesa):
         cursor.close()
     return render_to_response('pos/products_list.html', context, context_instance=RequestContext(request))
 
-
+@login_required
 def products(request, mesa):
     context={}
     mesa = int(mesa)    
@@ -142,8 +143,8 @@ def category(request, mesa, id):
 
 def home(request, seccion):
     context={}
-    username = settings.ERP_UN
-    password = settings.ERP_PW
+    username = settings.DJ_UN
+    password = settings.DJ_PW
     user = authenticate(username=username, password=password)
     if user is not None:
         if user.is_active:

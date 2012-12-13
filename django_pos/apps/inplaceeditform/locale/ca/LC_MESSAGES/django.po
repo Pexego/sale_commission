@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-06-23 12:59+0200\n"
+"POT-Creation-Date: 2012-09-18 04:56-0500\n"
 "PO-Revision-Date: 2011-08-19 11:52+0100\n"
 "Last-Translator: Raimon Esteve <resteve@zikzakmedia.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,17 +16,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: fields.py:88
-msgid "Dobleclick to edit"
-msgstr "Dos clicks per editar"
+#: templates/inplaceeditform/inc.inplace_toolbar.html:3
+msgid "Enable edit inline"
+msgstr ""
 
-#: fields.py:153
-msgid "Write a traslation"
-msgstr "Escriu la traducció"
+#: templates/inplaceeditform/inc.inplace_toolbar.html:4
+msgid "Disable edit inline"
+msgstr ""
 
 #: templates/inplaceeditform/inplace_js.html:14
 msgid "Successfully saved"
 msgstr "Desat amb èxit"
+
+#: templates/inplaceeditform/inplace_js.html:18
+msgid "You have unsaved changes!"
+msgstr ""
 
 #: templates/inplaceeditform/render_field.html:9
 #: templates/inplaceeditform/adaptor_file/render_field.html:5
@@ -45,4 +49,3 @@ msgstr "Cancel·la canvis"
 #: templates/inplaceeditform/render_field.html:18
 msgid "Cancel"
 msgstr "Cancel·la"
-
