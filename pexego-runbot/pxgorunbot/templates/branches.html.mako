@@ -57,22 +57,12 @@ build) may not give an immediate feedback.</p>
     </div>
 % endif
 
-    <div id="the-queue" class="pane">
-<h2>Queue (${len(r.get_queue())} items)</h2>
-<table>
-% for i in r.get_queue():
-    ${defs.simple_row(r,i)}
-% endfor
-</table>
-    </div>
-
     <div class="pane">
       <h2>Runtime data</h2>
         <div class="stats">
         (The following data are global to the Runbot.)<br />
         Maximum ${r.number} concurrent branches.<br />
         ${r.current_job_id} processed jobs.<br />
-        ${r.manual_build_count} manual build requests to go.<br />
         </div>
     </div>
 

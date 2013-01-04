@@ -15,18 +15,17 @@ def runbot_init(wd):
     dest = os.path.join(wd,'repo')
     if not os.path.exists(dest):
         pxgorunbot.core.run(["bzr","init-repo",dest])
-    for i in ['static','lpcache',]:
+    for i in ['static',]:
         dest = os.path.join(wd,i)
         if not os.path.exists(dest):
             os.mkdir(dest)
     path = os.path.dirname(sys.modules['__main__'].__file__)
-    pxgorunbot.core.run(["cp", "-r", os.path.join(path, "css"), "static/"])
-    pxgorunbot.core.run(["cp", "-r", os.path.join(path, "font"), "static/"])
-    pxgorunbot.core.run(["cp", "-r", os.path.join(path, "img"), "static/"])
-    pxgorunbot.core.run(["cp", "-r", os.path.join(path, "js"), "static/"])
+    pxgorunbot.core.run(["cp", "-r", os.path.join(path, "css"), "static/css"])
+    pxgorunbot.core.run(["cp", "-r", os.path.join(path, "font"), "static/font"])
+    pxgorunbot.core.run(["cp", "-r", os.path.join(path, "img"), "static/img"])
+    pxgorunbot.core.run(["cp", "-r", os.path.join(path, "js"), "static/js"])
     pxgorunbot.core.run(["cp", os.path.join(path, "favicon.ico"), "static/"])
-    pxgorunbot.core.run(["cp", os.path.join(path, "style.css"), "static/"])
-    pxgorunbot.core.run(["cp", os.path.join(path, "logo.png"), "static/"])
+    #pxgorunbot.core.run(["cp", os.path.join(path, "logo.png"), "static/img"])
     pxgorunbot.core.run(["cp", os.path.join(path, "robots.txt"), "static/"])
     pxgorunbot.core.run('sudo su - postgres -c "createuser -s $USER"')
     pxgorunbot.models.create_tables()
@@ -36,7 +35,7 @@ def runbot_clean(wd):
     """
     dest = os.path.join(wd,'repo')
     pxgorunbot.core.run(["rm","-rf",dest])
-    for i in ['static','lpcache']:
+    for i in ['static',]:
         dest = os.path.join(wd,i)
         pxgorunbot.core.run(["rm","-rf",dest])
 
@@ -51,7 +50,6 @@ def main():
     parser.add_option("--run", action="store_true", help="run the runbot")
     parser.add_option("--clean", action="store_true", help="remove any runbot-generated files (use `rm -rf`)")
     parser.add_option("--dir", metavar="DIR", default=".", help="runbot working dir (%default)")
-    #parser.add_option("--nginx-domain", metavar="DOMAIN", default="pxgorunbot", help="virtual host domain (%default)")
     parser.add_option("--flask-port", metavar="PORT", default=5000, help="starting port for flask server (%default)")
     parser.add_option("--number", metavar="NUMBER", default=16, help="max concurrent instance to run (%default)")
     parser.add_option("--test", metavar="INT", default=1, help="run tests flag (%default)")
@@ -70,7 +68,7 @@ def main():
 
         r = pxgorunbot.core.RunBot(o.dir, server_net_port,
             server_xml_port, client_web_port, o.number, o.flask_port, o.test, int(o.start_job_id),
-            o.debug)#, o.config)
+            o.debug)
         runbot_kill_msg()
         r.loop()
         runbot_kill_msg()

@@ -58,12 +58,6 @@ ${b.name}
 </span>
 </%def>
 
-<%def name="build_button_(r, g)">
-<form method="POST" action="/a?build=${g.name}&amp;project=${g.name}">
-    <button type="submit">Force Build</button>
-</form>
-</%def>
-
 <%def name="short_row_(r,g)">
         <tr>
           <th>
@@ -71,11 +65,6 @@ ${b.name}
 % for b in g.repo_updates():
     ${branch_(r,g,b)}
 % endfor
-% if g.manual_build != sys.maxint:
-<p><span>(build n.${g.manual_build})</span></p>
-% else:
-    ${build_button_(r, g)}
-% endif
           </th>
 % for p in reversed(g.points):
 %   if p:
@@ -85,26 +74,5 @@ ${b.name}
 %   endif
 % endfor
         </tr>
-</%def>
-
-
-<%def name="simple_row(r,g)">
-<tr>
-    <td>
-<form method="POST" action="/a?build=${g.name}&amp;project=${g.name}">
-% if g.manual_build != sys.maxint:
-<strong>${g.manual_build}.</strong>
-% endif
-${g.name}
-<span>(${g.name})</span>
-% if g.manual_build == sys.maxint:
-    <button type="submit">Force Build</button>
-% endif
-% for b in g.repo_updates():
-    ${branch_(r,g,b)}
-% endfor
-</form>
-    </td>
-</tr>
 </%def>
 

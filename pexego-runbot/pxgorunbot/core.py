@@ -2,7 +2,6 @@
 import ConfigParser
 import os
 import re
-import simplejson
 import subprocess
 import sys
 import threading
@@ -77,7 +76,6 @@ class Job(object):
         # Running path <Root>/static/<domain>
         self.subdomain = "%s-%s"%(self.name.replace('_','-').replace('.','-'),self.job_id)
         self.running_path = os.path.join(project.runbot.wd,'static',self.subdomain)
-        self.json_path = project.json_path
         self.log_path = os.path.join(self.running_path,'logs')
         self.flags_path = os.path.join(self.running_path,'flags')
 
@@ -339,7 +337,6 @@ class Point(object):
         self.job_id = job.job_id
         self.db = job.db
         self.running_path = job.running_path
-        self.json_path = job.json_path
         self.subdomain = job.subdomain
         self.need_run_reason = project.need_run_reason
 
@@ -355,33 +352,6 @@ class Point(object):
         self.running_t0 = job.running_t0
         self.test_base_result = job.test_base_result
         self.test_all_result = job.test_all_result
-
-    def save_json(self):
-        """Append the point data to a JSON file for posterity."""
-        # A job must be saved only once.
-        if hasattr(self, 'json_saved'):
-            log("=== save_json() called more than once. ===", job_id=self.job_id)
-        self.json_saved = True
-
-        path = self.json_path
-        state = {}
-
-        if os.path.exists(path):
-            with open(path, 'r') as h:
-                state = simplejson.loads(h.read())
-
-        value = {}
-        for a in [
-            'job_id', 'db', 'running_path', 'subdomain', 'need_run_reason',
-            'test_base_result', 'test_all_result',
-            ]:
-            value[a] = getattr(self, a)
-        state.setdefault('jobs', [])
-        state['jobs'].append(value)
-
-        with open(path, 'w') as h:
-            data = simplejson.dumps(state, sort_keys=True, indent=4)
-            h.write(data)
 
 class RunbotDownload(object):
 
@@ -482,8 +452,6 @@ class RunbotProject(object):
         self.web = None
         self.runbot_addons = []
 
-        self.json_path=os.path.join(runbot.wd,'static',"%s.json"%(self.name))
-
         # A normal manual_build is maxint, a manual_build is used only when
         # manually requesting a build with a 'build' command pushed in the
         # queue. The value will be reset to maxint after the build is done.
@@ -503,7 +471,6 @@ class RunbotProject(object):
                 break
         if p and p.state != 'running':
             p.update(j)
-            p.save_json()
 
     def all_points_completed(self):
         for p in self.points:
@@ -615,11 +582,6 @@ class RunBot(object):
         self.current_job_id = current_job_id
         self.debug = debug
         self.manual_build_count = 0
-        #self.nginx = False
-        
-    def get_queue(self):
-        gs = sorted(self.projects, key=lambda x: x.manual_build)
-        return filter(lambda g: g.manual_build != sys.maxint, gs)
 
     def populate_projects(self):
         for project in models.Project.select():
@@ -677,9 +639,6 @@ class RunBot(object):
     def urls_config(self):
         return pxgorunbot.templates.render_template('urls.conf.mako',r=self)
 
-    def registration_page(self):
-        return pxgorunbot.templates.render_template('registration.html.mako',r=self)
-
     def flask_reload(self):
         try:
             f = open(os.path.join(self.wd,'urls.conf'),"w")
@@ -709,14 +668,6 @@ class RunBot(object):
                 log("WARNING: exception when templating %s:" % fn)
                 if f: f.close()
                 break
-
-        try:
-            f = open(os.path.join(self.wd,'static','register.html'),"w")
-            content = self.registration_page()
-            f.write(content)
-        except Exception, e:
-            log("WARNING: exception when templating register.html:")
-            if f: f.close()
 
         self.flask_reload()
 
