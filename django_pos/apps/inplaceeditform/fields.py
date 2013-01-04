@@ -7,7 +7,7 @@ from django.utils import simplejson
 
 from django.utils.translation import ugettext
 
-from inplaceeditform.commons import apply_filters, import_module, has_transmeta, get_static_url
+from inplaceeditform.commons import apply_filters, import_module, has_transmeta, get_static_url, get_admin_static_url
 from inplaceeditform.perms import SuperUserPermEditInline
 
 
@@ -31,6 +31,7 @@ class BaseAdaptorField(object):
         self.config['app_label'] = self.model._meta.app_label
         self.config['module_name'] = self.model._meta.module_name
         self.config['filters_to_show'] = filters_to_show
+        self.config['can_auto_save'] = 1
 
         filters_to_edit = self.config.get('filters_to_edit', None)
         self.filters_to_edit = filters_to_edit and filters_to_edit.split('|') or []
@@ -53,11 +54,30 @@ class BaseAdaptorField(object):
 
     @property
     def classes(self):
-        return 'inplaceedit %sinplaceedit' % (self.name)
+        return 'inplaceedit %s' % (self.name)
 
     @classmethod
     def get_config(self, **kwargs):
-        return kwargs
+        """
+        Get the arguments given to the template tag element and complete these
+        with the ones from the settings.py if necessary.
+        """
+        config = kwargs
+
+        config_from_settings = getattr(
+            settings, "DEFAULT_INPLACE_EDIT_OPTIONS", {})
+        config_one_by_one = getattr(
+            settings, "DEFAULT_INPLACE_EDIT_OPTIONS_ONE_BY_ONE", False)
+
+        if not config_one_by_one:
+            # Solution 1: Using default config only if none specified.
+            if not config and config_from_settings:
+                config = config_from_settings
+        else:
+            # Solution 2: Updating the configured config with the default one.
+            config = dict(config_from_settings, **config)
+
+        return config
 
     def get_form_class(self):
         return modelform_factory(self.model)
@@ -90,8 +110,15 @@ class BaseAdaptorField(object):
         return self.empty_value()
 
     def empty_value(self):
-        return ugettext(getattr(settings, 'INPLACEEDIT_EDIT_EMPTY_VALUE',
-                                          'Dobleclick to edit'))
+        '''
+        Get the text to display when the field is empty.
+        '''
+        edit_empty_value = self.config.get('edit_empty_value', False)
+        if edit_empty_value:
+            return edit_empty_value
+        else:
+            return ugettext(getattr(settings, 'INPLACEEDIT_EDIT_EMPTY_VALUE',
+                                    'Dobleclick to edit'))
 
     def render_field(self, template_name="inplaceeditform/render_field.html", extra_context=None):
         extra_context = extra_context or {}
@@ -106,7 +133,7 @@ class BaseAdaptorField(object):
         extra_context = extra_context or {}
         context = {'field': self.get_field(),
                    'STATIC_URL': get_static_url(),
-                   'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX}
+                   'ADMIN_MEDIA_PREFIX': get_admin_static_url()}
         context.update(extra_context)
 
         return render_to_string(template_name, context)
@@ -139,10 +166,14 @@ class BaseAdaptorField(object):
         return self.config.get('auto_width', False)
 
     def treatment_height(self, height, width=None):
-        return "%spx" % height
+        if isinstance(height, basestring) and not height.endswith('px') or not isinstance(height, basestring):
+            height = "%spx" % height
+        return height
 
     def treatment_width(self, width, height=None):
-        return "%spx" % width
+        if isinstance(width, basestring) and not width.endswith('px') or not isinstance(width, basestring):
+            width = "%spx" % width
+        return width
 
     def _adding_size(self, field):
         attrs = field.field.widget.attrs
@@ -211,10 +242,6 @@ class AdaptorTextAreaField(BaseAdaptorField):
     def name(self):
         return 'textarea'
 
-    @property
-    def classes(self):
-        return "textareainplaceedit %s" % super(AdaptorTextAreaField, self).classes
-
 
 class AdaptorBooleanField(BaseAdaptorField):
 
@@ -234,6 +261,10 @@ class AdaptorBooleanField(BaseAdaptorField):
 
 
 class BaseDateField(BaseAdaptorField):
+
+    def __init__(self, *args, **kwargs):
+        super(BaseDateField, self).__init__(*args, **kwargs)
+        self.config['can_auto_save'] = 0
 
     def render_media_field(self, template_name="inplaceeditform/adaptor_date/render_media_field.html"):
         return super(BaseDateField, self).render_media_field(template_name)
@@ -361,6 +392,10 @@ class AdaptorCommaSeparatedManyToManyField(AdaptorManyToManyField):
     def name(self):
         return 'm2mcomma'
 
+    def __init__(self, *args, **kwargs):
+        super(AdaptorCommaSeparatedManyToManyField, self).__init__(*args, **kwargs)
+        self.config['can_auto_save'] = 0
+
     def render_value(self, field_name=None, template_name="inplaceeditform/adaptor_m2m/render_commaseparated_value.html"):
         queryset = super(AdaptorCommaSeparatedManyToManyField, self).render_value(field_name)
         return render_to_string(template_name, {'queryset': queryset})
@@ -372,7 +407,7 @@ class AdaptorFileField(BaseAdaptorField):
 
     def __init__(self, *args, **kwargs):
         super(AdaptorFileField, self).__init__(*args, **kwargs)
-        self.config['send_csrfToken'] = 1
+        self.config['can_auto_save'] = 0
 
     def loads_to_post(self, request):
         files = request.FILES.values()
@@ -404,7 +439,11 @@ class AdaptorFileField(BaseAdaptorField):
         return render_to_string(template_name, config)
 
     def save(self, value):
-        getattr(self.obj, self.field_name).save(value.name, value)
+        file_name = value and value.name
+        if not file_name:
+            super(AdaptorFileField, self).save(value)
+        else:
+            getattr(self.obj, self.field_name).save(file_name, value)
 
 
 class AdaptorImageField(AdaptorFileField):

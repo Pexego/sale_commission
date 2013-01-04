@@ -188,11 +188,15 @@ LOGGING = {
 
 #OpenERP connector conf
 ENABLE_ERP = True
-ERP_CONF = ""
-ERP_PATH = ""
-ERP_UN = ''
-ERP_PW = ''
-ERP_DB = ''
+ERP_CONF = "/opt/openerp/6.1/server/install/openerp-server.conf"
+ERP_PATH = "/opt/openerp/6.1/server/"
+ERP_UN = 'admin'
+ERP_PW = 'admin'
+ERP_DB = 'pos_dev'
+
+#Usuario Django
+DJ_UN = 'admin'
+DJ_PW = 'pxgoadmin'
 
 # Dajax
 DAJAXICE_MEDIA_PREFIX="dajaxice"
