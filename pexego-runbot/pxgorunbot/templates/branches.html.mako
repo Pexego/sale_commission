@@ -2,11 +2,11 @@
 <html>
 <head>
   <title>Pexego Runbot - ${project_name}</title>
-  <link rel="shortcut icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="css/runbot.css" type="text/css">
-  <script src="js/jquery-1.7.1.min.js"></script>
-  <script src="js/dropdown.js"></script>
-  <script src="js/runbot.js"></script>
+  <link rel="shortcut icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="/static/css/runbot.css" type="text/css">
+  <script src="/static/js/jquery-1.7.1.min.js"></script>
+  <script src="/static/js/dropdown.js"></script>
+  <script src="/static/js/runbot.js"></script>
 </head>
 <body>
 
@@ -16,16 +16,16 @@
 
     <div class="topbar">
       <ul class="nav">
-        <li><a href="/"><img src="img/logo.png" alt="" class="png"></a> </li>
+        <li><a href="/"><img src="/static/img/logo.png" alt="" class="png"></a> </li>
         <li class="dropdown" data-dropdown="dropdown">
           <a href="#" class="dropdown-toggle">Projects</a>
           <ul class="dropdown-menu">
 % for tname in r.projects_with_branches():
-    <li><a href="/${tname}.html">${tname}</a></li>
+    <li><a href="/project/${tname}">${tname}</a></li>
 % endfor
           </ul>
         </li>
-        <li><a href="#the-queue">Queue (${len(r.get_queue())})</a> </li>
+        <li><a href="/admin">Admin</a> </li>
         <li><a href="#">About</a> </li>
       </ul>
       <div class="clear"></div>
@@ -45,12 +45,12 @@ build) may not give an immediate feedback.</p>
 <p>The Runbot maintains ${r.number} concurrent branches.</p>
     </div>
 
-% if r.nginx_projects_development(project_name):
+% if r.flask_projects_development(project_name):
     <div class="pane">
       <!--<input class="searchbox" placeholder="Search branches...">-->
       <h2>Branches</h2>
       <table cellspacing="0">
-% for i in r.nginx_projects_development(project_name):
+% for i in r.flask_projects_development(project_name):
     ${defs.short_row_(r,i)}
 % endfor
       </table>

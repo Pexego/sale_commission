@@ -76,3 +76,7 @@ pexego-runbot/nginx/error.log
 pexego-runbot/nginx/nginx.conf
 pexego-runbot/nginx/nginx.pid
 pexego-runbot/runbot.db
+pexego-runbot/pxgorunbot/static
+pexego-runbot/.coverage
+pexego-runbot/static
+pexego-runbot/static/6-1-1

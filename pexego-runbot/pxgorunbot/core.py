@@ -15,7 +15,6 @@ import pxgorunbot
 from pxgorunbot.misc import *
 
 vcs_file = ConfigParser.ConfigParser()
-print "PAAAAAAAAAAAAAAAAAAAAAAAAAAAATHHHHHHHHHHHHHHHHH: ", os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'config/vcs.conf')
 vcs_file.read(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'config/vcs.conf'))
 
 extensions_file = ConfigParser.ConfigParser()
@@ -34,16 +33,12 @@ def process_command(command):
     return command.split('|')
 
 def has_test_enable_flag(server_bin_path):
-    print "has_test_enable_flag"
     p1 = subprocess.Popen([server_bin_path, "--help"],
         stdout=subprocess.PIPE)
-    print "p1: ", p1
     p2 = subprocess.Popen(["grep", "test-enable"], stdin=p1.stdout,
         stdout=subprocess.PIPE)
-    print "p2: ", p2
     p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
     output = p2.communicate()[0]
-    print "output: ", output
     return output == "    --test-enable       Enable YAML and unit tests.\n"
 
 class Job(object):
@@ -53,7 +48,6 @@ class Job(object):
     """
 
     def __init__(self, project, port, test, job_id, debug, project_name, db_path=None, custom_addons=[], modules=None):
-        print "INIT Job"
         self.project = project
         self.job_id = job_id
         self.name = project_name
@@ -69,19 +63,16 @@ class Job(object):
         self.running_t0=0
 
         repo = os.path.join(project.runbot.wd,'repo')
+        repo = os.path.join(repo, project_name)
         self.server_path = project.server.path
-        print "self.server_path: ", self.server_path
         self.client_web_path = project.client_web.path if project.client_web else None
-        print "self.client_web_path: ", self.client_web_path
         self.web_src = project.web.path if project.web else None
-        print "self.web_src: ", self.web_src
 
         # if addons is not the full addons branch use trunk
         if custom_addons:
             self.addons_src = [a.path for a in project.runbot_addons if not a.custom and not a.brancheable] + custom_addons
         else: 
             self.addons_src = [a.path for a in project.runbot_addons]
-        print "self.addons_src: ", self.addons_src
 
         # Running path <Root>/static/<domain>
         self.subdomain = "%s-%s"%(self.name.replace('_','-').replace('.','-'),self.job_id)
@@ -141,15 +132,12 @@ class Job(object):
         
         if self.version != "6.0":
             self.addons_path = self.fill_addons_path()
-            print "self.addons_path: ", self.addons_path
         else:
             self.addons_path = False
             self.link_addons()
 
     def link_addons(self):
-        print "link_addons"
         addons_path_root = os.path.join(self.server_path,"bin/addons")
-        print "addons_path_root: ", addons_path_root
         for addons_path in self.addons_src:
             for module in os.listdir(addons_path):
                 run(["ln","-s",os.path.join(addons_path,module),addons_path_root])
@@ -160,25 +148,21 @@ class Job(object):
 
 
     def fill_addons_path(self):
-        print "fill_addons_path"
         addons_path = []
         if self.web_src:
             addons_path.append(self.web_src + "/addons")
         addons_path.extend(self.addons_src)
         if self.download_src:
             addons_path.append(self.download_src)
-
         return addons_path
 
     def spawn(self):
-        print "spawn"
         log("runbot-spawn-worker-" + str(self.job_id), project=self.name)
         t = threading.Thread(target=self.work, name=('runbot-group-worker-' + str(self.job_id)))
         t.daemon = True
         t.start()
 
     def work(self):
-        print "work"
         try:
             #self.project.pull_branches()
             self.start_time = time.time()
@@ -189,10 +173,8 @@ class Job(object):
         except Exception, e:
             self.completed = True
             log("runbot-end-worker [with exception]", job=self.name)
-            print traceback.format_exc()
 
     def start_createdb(self):
-        print "start_createdb"
         run(["psql","template1","-c","select pg_terminate_backend(procpid) from pg_stat_activity where datname in ('%s','%s')"%(self.db,self.db_all)])
         time.sleep(3)
         run(["dropdb",self.db])
@@ -201,15 +183,10 @@ class Job(object):
         run(["createdb",self.db_all])
 
     def run_log(self, cmd, logfile, env=None):
-        print "run_log"
         env = dict(os.environ, **env) if env else None
         log("run", *cmd, logfile=logfile)
-        print "logfile: ", logfile
         out=open(logfile,"w")
-        print "out: ", out
-        print "CMD: ", cmd
         p=subprocess.Popen(cmd, stdout=out, stderr=out, close_fds=True, env=env)
-        print "CMD2: ", cmd
         self.running_server_pid=p.pid
         p.communicate()
         return p
@@ -217,25 +194,20 @@ class Job(object):
     def resolve_server_bin_path(self):
         # This can be done only if the files are present otherwise the if
         # will always fail. Alternatively, server_bin_path could be a property.
-        print "resolve_server_bin_path"
         if not os.path.exists(self.server_bin_path): # for 6.0 branches
             self.server_bin_path=os.path.join(self.server_path,"bin","openerp-server.py")
 
     def start_test_base(self):
-        print "start_test_base"
         log("job-start-server-base")
         cmd = [self.server_bin_path,"-d",self.db,"-i","base","--stop-after-init","--no-xmlrpc","--no-xmlrpcs","--no-netrpc","--log-level=test"]
         if self.addons_path:
             cmd.append("--addons-path=" + ",".join(self.addons_path))
         _has_test_enable_flag = False
-        print "PATHHHHHHHHHHHHHHHHHHHHHHHHHHH: ", self.server_bin_path
-        print "EXISTSSSSS: ", os.path.exists(self.server_bin_path)
         if has_test_enable_flag(self.server_bin_path):
             cmd.append("--test-enable")
             _has_test_enable_flag = True
         cmd = ["coverage","run","--branch"] + cmd
         self.run_log(cmd, logfile=self.test_base_path,env={'COVERAGE_FILE': self.coverage_file_path})
-        print "COVERAGE"
         run(["coverage","html","-d",self.coverage_base_path,"--ignore-errors"],env={'COVERAGE_FILE': self.coverage_file_path})
         if _has_test_enable_flag:
             success_message = "openerp.modules.loading: Modules loaded."
@@ -245,7 +217,6 @@ class Job(object):
         self.test_base_result = rc
 
     def start_test_all(self):
-        print "start_test_all"
         log("job-start-server-all")
         if self.db_path:
             run(["psql","-d",self.db_all,"-f",self.db_path])
@@ -272,11 +243,8 @@ class Job(object):
         self.test_all_result = rc
 
     def start_server(self):
-        print "start_server"
         port = self.port
         log("job-start-server",branch=self.name,port=port)
-        print "netrpc: ", self.server_net_port+port
-        print "xmlrpc: ", self.server_xml_port+port
         cmd=[self.server_bin_path,"--no-xmlrpcs","--netrpc-port=%d"%(self.server_net_port+port),"--xmlrpc-port=%d"%(self.server_xml_port+port)]
         if self.addons_path:
             cmd.append("--addons-path=" + ",".join(self.addons_path))
@@ -289,7 +257,6 @@ class Job(object):
         self.running_server_pid=p.pid
 
     def start_client_web(self):
-        print "start_client_web"
         if not self.client_web_path:
             return
         port = self.port
@@ -311,7 +278,7 @@ class Job(object):
         openerp.server.protocol = 'socket'
         openerp.server.timeout = 450
         [openerp-web]
-        dblist.filter = 'BOTH'
+        #dblist.filter = 'BOTH'
         dbbutton.visible = True
         company.url = ''
         openerp.server.host = 'localhost'
@@ -333,13 +300,11 @@ class Job(object):
         self.client_web_pid=p.pid
 
     def start(self):
-        print "start"
         log("job-start",branch=self.name,port=self.port)
         #.start_rsync()
         self.stop()
         self.resolve_server_bin_path()
         self.start_createdb()
-        print "TESTS: ", self.test
         try:
             if self.test:
                 self.start_test_base()
@@ -350,16 +315,13 @@ class Job(object):
             self.start_server()
             self.start_client_web()
         except OSError,e:
-            print "EXCEPTION: ", e
             log("branch-start-error",exception=e)
         except IOError,e:
-            print "EXCEPTION: ", e
             log("branch-start-error",exception=e)
         self.running_t0=time.time()
         log("branch-started",branch=self.name,port=self.port)
 
     def stop(self):
-        print "stop"
         log("Stopping job", id=self.job_id, branch=self.name)
         if self.running_server_pid:
             kill(self.running_server_pid)
@@ -371,7 +333,6 @@ class Point(object):
     """A point is a build slot and associated to a worker thread."""
     def __init__(self, project, job):
         """Create a Point from a given group and job."""
-        print "INIT Point"
         self.version = project.version
         self.project_name  = project.name
         self.port = job.port
@@ -390,7 +351,6 @@ class Point(object):
         Update the Point from a job. The job should be the same than the one
         used in `__init__()`.
         """
-        print "update"
         self.state = 'running' if job.completed else 'testing'
         self.running_t0 = job.running_t0
         self.test_base_result = job.test_base_result
@@ -398,7 +358,6 @@ class Point(object):
 
     def save_json(self):
         """Append the point data to a JSON file for posterity."""
-        print "save_json"
         # A job must be saved only once.
         if hasattr(self, 'json_saved'):
             log("=== save_json() called more than once. ===", job_id=self.job_id)
@@ -427,7 +386,6 @@ class Point(object):
 class RunbotDownload(object):
 
     def __init__(self, command, path):
-        print "INIT Branch"
         self.path = path
         self.file_path = False
         self.command = command
@@ -435,14 +393,11 @@ class RunbotDownload(object):
         self.download_module()
 
     def download_module(self):
-        print "download_module"
         file_name = self.command[1].split(os.sep)[-1]
-        print "file_name: ", file_name
         file_extension = file_name.split(".")[-1]
         #FIXME
         run("cd " + self.path + " && " + " ".join(self.command))
         cmd = extensions_file.get(file_extension, "cmd")
-        print "CMD: ", cmd
         self.file_path = os.path.join(self.path,file_name)
         if cmd:
             run("cd " + self.path + " && " + cmd.replace("file",file_name))
@@ -451,7 +406,6 @@ class RunbotDownload(object):
 class RunbotBranch(object):
 
     def __init__(self, command, path, branch_type, project, custom=False, brancheable=False, branch_name=False):
-        print "INIT Branch"
         self.project = project
         self.vcs_type = command[0]
         self.branch = command[1]
@@ -468,7 +422,6 @@ class RunbotBranch(object):
         self.pull_branch()
 
     def info(self):
-        print "info"
         if "info" in vcs_file.options(self.vcs_type):
             info_cmd =  vcs_file.get(self.vcs_type, "info")
             return run_output(self.vcs_type + " " + info_cmd + " " + self.path)
@@ -476,13 +429,11 @@ class RunbotBranch(object):
             return ""
             
     def checkout(self):
-        print "checkout_branches"
         if os.path.exists(self.path):
             cmd = "cd " + self.path + " && " + self.vcs_type + " " + vcs_file.get(self.vcs_type, "checkout").replace("branch", self.branch_name)
             run(cmd)     
 
     def pull_branch(self):
-        print "pull_branch"
         if os.path.exists(self.path):
             cmd = "cd " + self.path + " && " + self.vcs_type + " " + vcs_file.get(self.vcs_type, "pull")
             #TODO: Quizás sea necesario un update
@@ -492,9 +443,7 @@ class RunbotBranch(object):
         run(cmd)
 
         revision = run_and_get("cd " + self.path + " && " + self.vcs_type + " " + vcs_file.get(self.vcs_type, "revision"))
-        print "revision: ", revision
         if revision != self.revision:
-            print "Actualizar revision"
             self.commiter = run_and_get("cd " + self.path + " && " + self.vcs_type + " " + vcs_file.get(self.vcs_type, "committer"))
             self.revision = revision
             if self.name not in self.project.need_run_reason:
@@ -504,7 +453,6 @@ class RunbotBranch(object):
             self.checkout()
             
     def get_branches(self):
-        print "get_branches"
         if os.path.exists(self.path) and self.brancheable:
             cmd = "cd " + self.path + " && " + self.vcs_type + " " + vcs_file.get(self.vcs_type, "branches")
             branches = run_and_get(cmd)
@@ -515,7 +463,6 @@ class RunbotBranch(object):
 class RunbotProject(object):
 
     def __init__(self,project,runbot,server_branch,client_web_branch=None,web_branch=None):
-        print "INIT Project"
         self.db_project = project
         self.name = underscore(project.name)
         self.runbot = runbot
@@ -545,13 +492,11 @@ class RunbotProject(object):
         self.points = [None for x in xrange(POINTS)]
 
     def add_point(self, j):
-        print "add_point"
         assert not j.completed
         p = Point(self, j)
         self.points = self.points[1:] + [p] # TODO delete db and on-disk data
 
     def complete_point(self, j):
-        print "complete_point"
         assert j.completed
         for p in self.points + [None]:
             if p and p.job_id == j.job_id:
@@ -561,7 +506,6 @@ class RunbotProject(object):
             p.save_json()
 
     def all_points_completed(self):
-        print "all_points_completed"
         for p in self.points:
             if p is not None and p.state != 'running':
                 return False
@@ -577,7 +521,6 @@ class RunbotProject(object):
             r.append(copy.copy(self.web))
         elif self.client_web:
             r.append(copy.copy(self.client_web))
-        print "REPOS: ", r
         return r
 
     def is_ok(self):
@@ -585,20 +528,17 @@ class RunbotProject(object):
         Test whether the group is useable, i.e. if self.populate_branches()
         didn't early return.
         """
-        print "is_ok"
         if self.server and (self.web or self.client_web) and self.runbot_addons:
             return True
         else:
             return False
 
     def create_project(self):
-        print "create_project"
         log("runbot-create-project")
         repo = os.path.join(self.runbot.wd, 'repo')
-
+        repo = os.path.join(repo, self.name)
         if not self.server:
             path = os.path.join(repo, '__configured_' + self.name + '_server')
-            print "path: ", path
             self.server = RunbotBranch(self.server_branch, path, "server", self)
         else:
             self.server.pull_branch()
@@ -650,7 +590,6 @@ class RunbotProject(object):
             if not os.path.exists(path):
                 os.mkdir(path)
         for module in self.downloads_url:
-            print "MODULEEEEEEEEEEEEEEEEEEEEEEE: ", module.command
             if module.command not in [b.command for b in self.runbot_downloads]:
                 self.runbot_downloads.append(RunbotDownload(process_command(module.command), path))
                 module.path = path
@@ -661,16 +600,14 @@ class RunbotProject(object):
 class RunBot(object):
     """Used as a singleton, to manage almost all the Runbot state and logic."""
     def __init__(self, wd, server_net_port, server_xml_port,
-        client_web_port,  number, nginx_port, domain, test,
+        client_web_port,  number, flask_port, test,
         current_job_id, debug):
-        print "INIT RunBot"
         self.wd=os.path.abspath(wd)
         self.server_net_port=int(server_net_port)
         self.server_xml_port=int(server_xml_port)
         self.client_web_port=int(client_web_port)
         self.number=int(number)
-        self.nginx_port=int(nginx_port)
-        self.domain=domain
+        self.flask_port=int(flask_port)
         self.test=int(test)
         self.projects = []
         self.allocated_port = 0
@@ -678,16 +615,14 @@ class RunBot(object):
         self.current_job_id = current_job_id
         self.debug = debug
         self.manual_build_count = 0
-        self.nginx = False
+        #self.nginx = False
         
     def get_queue(self):
         gs = sorted(self.projects, key=lambda x: x.manual_build)
         return filter(lambda g: g.manual_build != sys.maxint, gs)
 
     def populate_projects(self):
-        print "Runbot.populate_projects"
         for project in models.Project.select():
-            print "PROJECTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT: ", project.name
             server_branch = False
             client_web_branch = False
             web_branch = False
@@ -696,8 +631,6 @@ class RunBot(object):
                 client_web_branch = process_command(project.web_client)
             elif project.openerp_web:
                 web_branch = process_command(project.openerp_web)
-            print "underscore(section): ", underscore(project.name)
-            print "[x.name for x in self.projects]: ", [x.name for x in self.projects]
             if underscore(project.name) not in [x.name for x in self.projects]:
                 p = RunbotProject(project,self,server_branch,client_web_branch,web_branch)
                 self.projects.append(p)
@@ -710,84 +643,70 @@ class RunBot(object):
 
 
     def fetch_projects(self):
-        print "fetch_projects"
         self.populate_projects()
 
         log("runbot-run-group", projects=len(self.projects))
         return self.projects
     
-    def nginx_projects_development(self,project_name):
+    def flask_projects_development(self,project_name):
         gs = [(g.name,g) for g in self.projects if g.name==project_name]
         gs.sort()
         return [g for (x,g) in gs]
     
-    def nginx_projects(self):
-        print "nginx_projects"
+    def flask_projects(self):
         return pxgorunbot.templates.render_template('index.html.mako',
             r=self,t=time.time(),re=re)
 
     def projects_with_branches(self):
-        print "projects_with_branches"
         ps = [p.name for p in self.projects]
         ps = list(set(ps))
         ps.sort()
         return ps
 
-    def nginx_index_time(self,t):
-        print "nginx_index_time"
+    def flask_index_time(self,t):
         for m,u in [(86400,'d'),(3600,'h'),(60,'m')]:
             if t>=m:
                 return str(int(t/m))+u
         return str(int(t))+"s"
 
-    def nginx_index(self, project_name):
-        print "nginx_index"
+    def flask_index(self, project_name):
         return pxgorunbot.templates.render_template('branches.html.mako',
             r=self, t=time.time(), re=re, project_name=project_name, sys=sys)
-            
-    def run_nginx(self):        
-        if self.nginx:
-            run(["nginx","-p",self.wd + "/","-c",os.path.join(self.wd,"nginx/nginx.conf"),"-s","reload"]) 
-        else:
-            run(["nginx","-p",self.wd + "/","-c",os.path.join(self.wd,"nginx/nginx.conf")])
-            self.nginx = True
     
-    
-    def nginx_reload(self):
-        print "nginx_reload"
-        t = threading.Thread(target=self.run_nginx, name=('run_nginx'))
-        t.daemon = True
-        t.start()
         
-    def nginx_config(self):
-        print "nginx_config"
-        return pxgorunbot.templates.render_template('nginx.conf.mako',r=self)
+    def urls_config(self):
+        return pxgorunbot.templates.render_template('urls.conf.mako',r=self)
 
     def registration_page(self):
-        print "registration_page"
         return pxgorunbot.templates.render_template('registration.html.mako',r=self)
 
-    def nginx_update(self):
-        print "nginx_update"
+    def flask_reload(self):
+        try:
+            f = open(os.path.join(self.wd,'urls.conf'),"w")
+            content = self.urls_config()
+            f.write(content)
+        except Exception, e:
+            log("WARNING: exception when templating urls.conf:")
+            if f: f.close()
+
+    def flask_update(self):
         try:
             f = None
             f = open(os.path.join(self.wd,'static','index.html'),"w")
-            content = self.nginx_projects()
+            content = self.flask_projects()
             f.write(content)
         except Exception, e:
             log("WARNING: excepneed_run_reasontion when templating index.html:")
-            print traceback.format_exc()
             if f: f.close()
         for project_name in self.projects_with_branches():
             try:
                 f = None
                 fn = project_name + '.html'
                 f = open(os.path.join(self.wd,'static',fn),"w")
-                content = self.nginx_index(project_name)
+                content = self.flask_index(project_name)
                 f.write(content)
             except Exception, e:
                 log("WARNING: exception when templating %s:" % fn)
-                print traceback.format_exc()
                 if f: f.close()
                 break
 
@@ -797,21 +716,11 @@ class RunBot(object):
             f.write(content)
         except Exception, e:
             log("WARNING: exception when templating register.html:")
-            print traceback.format_exc()
             if f: f.close()
 
-        try:
-            f = open(os.path.join(self.wd,'nginx','nginx.conf'),"w")
-            content = self.nginx_config()
-            f.write(content)
-        except Exception, e:
-            log("WARNING: exception when templating nginx.conf:")
-            print traceback.format_exc()
-            if f: f.close()
-        self.nginx_reload()
+        self.flask_reload()
 
     def process_command_queue(self):
-        print "process_command_queue"
         while not pxgorunbot.queue.empty():
             command, params = pxgorunbot.queue.get()
             if command == 'build':
@@ -824,7 +733,6 @@ class RunBot(object):
                 log("WARNING: unknown command", command)
 
     def reset_build_numbers(self):
-        print "reset_build_numbers"
         self.projects.sort()
         ps = [x for x in self.projects]
         self.manual_build_count = 0
@@ -835,28 +743,21 @@ class RunBot(object):
             p.manual_build = self.manual_build_count
 
     def allocate_port(self):
-        print "allocate_port"
         if self.allocated_port > self.number * 2:
             self.allocated_port = 0
         self.allocated_port += 1
         return self.allocated_port
 
     def run_projects(self):
-        print "run_projects"
         res = True
-        print "self.projects: ", self.projects
         for p in self.projects:
 
             if len(self.jobs) > self.number:
-                print "len(self.jobs) > self.number"
                 res = False
                 break
                 
             # Don't run multiple jobs at the same time for the same group.
-            print "p.need_run_reason: ", p.need_run_reason
-            print "p.all_points_completed(): ", p.all_points_completed()
             if p.need_run_reason and p.all_points_completed():
-                print "self.jobs: ", self.jobs
                 manage = False
                 p.need_run_reason = []
                 p.manual_build = sys.maxint
@@ -869,7 +770,6 @@ class RunBot(object):
                         job.spawn()
                         manage = True
                 if not manage:
-                    print "p.need_run_reason and p.all_points_completed()"
                     port = self.allocate_port()
                     self.current_job_id += 1
                     job = Job(p, port, self.test, self.current_job_id, self.debug, p.name)
@@ -906,7 +806,6 @@ class RunBot(object):
                 
     def complete_jobs(self):
         """Update all slots with the completed jobs."""
-        print "complete_jobs"
         for job in self.jobs.values():
             if job.completed:
                 for p in self.projects:
@@ -931,7 +830,6 @@ class RunBot(object):
         Repeatedly fetch branch information from Launchpad, run jobs, update
         HTML pages, ...
         """
-        print "LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOP"
         while 1:
             try:
                 while True: # 2 minutes
@@ -943,13 +841,12 @@ class RunBot(object):
                         self.reap_oldest_job()
                         self.reset_build_numbers()
                         if res:
-                            self.nginx_update()
+                            self.flask_update()
                         #for p in self.projects:
                         #    p.update_state(openerprunbot.state)
                     except Exception, e:
                         log("WARNING: exception:")
-                        print traceback.format_exc()
-                    time.sleep(10000)
+                    time.sleep(20)
             except KeyboardInterrupt,e:
                 log("SIGINT received, exiting...")
                 pxgorunbot.server.stop_server()

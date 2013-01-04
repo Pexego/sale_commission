@@ -2,7 +2,7 @@
           <td id="${p.job_id}">
             <span class="i action-toggle dropdown-toggle" data-toggle="dropdown">B</span>
     <ul class="dropdown-menu">
-        <li><a href="/${p.subdomain}/logs/test-all.txt">
+        <li><a href="/static/${p.subdomain}/logs/test-all.txt">
         % if p.test_all_result==False:
             Install logs (failure)
         % elif p.test_all_result==True:
@@ -11,9 +11,9 @@
             Install logs (ongoing)
         % endif
         </a></li>
-        <li><a href="/${p.subdomain}/logs/coverage-all/">Code coverage</a></li>
-        <li><a href="/${p.subdomain}/logs/server.txt">Server logs</a></li>
-        <li><a href="/${p.subdomain}/logs/client-web.txt">Web logs</a></li>
+        <li><a href="/static/${p.subdomain}/logs/coverage-all/index.html">Code coverage</a></li>
+        <li><a href="/static/${p.subdomain}/logs/server.txt">Server logs</a></li>
+        <li><a href="/static/${p.subdomain}/logs/client-web.txt">Web logs</a></li>
         <li>NET-RPC port: ${r.server_net_port+p.port}</li>
         <li>XML-RPC port: ${r.server_xml_port+p.port}</li>
         % if 'build' in p.need_run_reason:
@@ -35,15 +35,15 @@
 % if p.state == 'testing':
         <span class="testing">Testing...</span></p>
 % elif p.running_t0 and p.test_all_result:
-        <span class="running-long">Age: ${r.nginx_index_time(t-p.running_t0)}</span></p>
+        <span class="running-long">Age: ${r.flask_index_time(t-p.running_t0)}</span></p>
 % elif p.running_t0:
-        <span class="testing">Age: ${r.nginx_index_time(t-p.running_t0)}</span></p>
+        <span class="testing">Age: ${r.flask_index_time(t-p.running_t0)}</span></p>
 % else:
         <span class="testing">Internal error</span></p>
 % endif
 <a href="#${p.job_id}">(Build ${p.job_id})</a>
 % if ((p.job_id > r.current_job_id - r.number) and p.running_t0):
-    <form target="_blank" method="GET" action="http://${p.project_name}.${r.domain}:${r.nginx_port}">
+    <form target="_blank" method="GET" action="/openerp/${p.job_id}">
         <button type="submit">Connect</button>
     </form>
 % else:

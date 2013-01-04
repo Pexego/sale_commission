@@ -21,9 +21,9 @@ Installation
 Requirements:
 - python: werkzeug
 - python: simplejson
-- python: coverage
+- python: coverage con easy_install
 - python: peewee
-- nginx
+- python: flask
 - sqlite
 - git
 - bzr

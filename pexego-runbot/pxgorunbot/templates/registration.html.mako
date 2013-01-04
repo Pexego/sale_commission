@@ -2,12 +2,12 @@
 <html>
 <head>
 <title>OpenERP Runbot</title>
-<link rel="shortcut icon" href="/favicon.ico" />
-<link rel="stylesheet" href="/style.css" type="text/css">
+<link rel="shortcut icon" href="/static/favicon.ico" />
+<link rel="stylesheet" href="/static/style.css" type="text/css">
 </head>
 <body>
 <div class="main-column">
-<img src="/logo.png" /><br />
+<img src="/static/logo.png" /><br />
 <a href="/">OpenERP Runbot</a><br /><br />
 
 <h2 id="how">How to submit your team or branches</h2>
