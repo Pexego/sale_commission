@@ -32,6 +32,7 @@ class product_product(osv.osv):
         'structural_cost': fields.float('Structural cost', digits_compute=dp.get_precision('Production costs'), readonly=True),
         'manpower_cost': fields.float('Manpower cost', digits_compute=dp.get_precision('Production costs'), readonly=True),
         'other_prod_cost': fields.float('Other production_costs', digits_compute=dp.get_precision('Production costs'), readonly=True),
+        'product_cost': fields.float('Coste mat. prima', digits_compute=dp.get_precision('Production costs'), readonly=True),
     }
 
 product_product()

@@ -248,9 +248,11 @@ class mrp_product_produce(osv.osv_memory):
                     
                     pm_manpower_cost = ((stock_before_producing * main_product.product_id.manpower_cost) + (unit_manpower_cost * qty_finished_products))/ (stock_before_producing + qty_finished_products)
                     pm_fixed_cost = ((stock_before_producing * main_product.product_id.other_prod_cost) + (unit_fixed_cost * qty_finished_products))/ (stock_before_producing + qty_finished_products)
+                    pm_product_cost = ((stock_before_producing * main_product.product_id.other_prod_cost) + (unit_product_cost * qty_finished_products))/ (stock_before_producing + qty_finished_products)
 
                     vals_product['manpower_cost'] = pm_manpower_cost
                     vals_product['other_prod_cost'] = pm_fixed_cost
+                    vals_product['product_cost'] = pm_product_cost
 
                     self.pool.get('product.product').write(cr, uid, main_product.product_id.id, vals_product)
 

@@ -13,6 +13,7 @@
                         <group colspan="2" col="4">
                             <field name="manpower_cost"/>
                             <field name="other_prod_cost"/>
+                             <field name="product_cost"/>
                             <field name="structural_cost"/>
                             <newline/>
                         </group>
