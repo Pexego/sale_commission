@@ -50,7 +50,7 @@
              <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
             <field name="type">form</field>
             <field name="arch" type="xml">
-                <xpath expr="/form/notebook/page[@string='Consumed Products']" position="after">
+                <xpath expr="/form/notebook/page[@string='Extra Information']" position="before">
                     <page string="Fixed Costs" attrs="{'readonly':[('state', '=', 'done')]}">
                         <field name="fixed_costs" nolabel="1"/>
                     </page>

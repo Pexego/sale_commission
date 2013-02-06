@@ -29,8 +29,9 @@ class product_product(osv.osv):
     _inherit = 'product.product'
 
     _columns = {
-        'structural_cost': fields.float('Structural cost', digits_compute=dp.get_precision('Account'), readonly=True),
-        'manpower_cost': fields.float('Manpower cost', digits_compute=dp.get_precision('Account'), readonly=True),
+        'structural_cost': fields.float('Structural cost', digits_compute=dp.get_precision('Production costs'), readonly=True),
+        'manpower_cost': fields.float('Manpower cost', digits_compute=dp.get_precision('Production costs'), readonly=True),
+        'other_prod_cost': fields.float('Other production_costs', digits_compute=dp.get_precision('Production costs'), readonly=True),
     }
 
 product_product()

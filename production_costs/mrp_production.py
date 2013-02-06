@@ -121,11 +121,11 @@ class mrp_production_unit_costs (osv.osv):
     _columns = {
         'production_id': fields.many2one('mrp.production', 'Production', required=True),
         'product_id': fields.many2one('product.product', 'Product', required=True),
-        'unit_product_cost': fields.float('Material unit cost', digits_compute=dp.get_precision('Account'), readonly=True),
-        'manpower_unit_cost': fields.float('Manpower unit cost', digits_compute=dp.get_precision('Account'), readonly=True),
-        'unit_production_cost': fields.float('Unit production cost', digits_compute=dp.get_precision('Account'), readonly=True),
-        'unit_fixed_cost': fields.float('Unit fixed cost', digits_compute=dp.get_precision('Account'), readonly=True),
-        'new_standard_price': fields.float('New standard product price', digits_compute=dp.get_precision('Account'), readonly=True, help="New product price (only if its cost method is set to average)"),
+        'unit_product_cost': fields.float('Material unit cost', digits_compute=dp.get_precision('Production costs'), readonly=True),
+        'manpower_unit_cost': fields.float('Manpower unit cost', digits_compute=dp.get_precision('Production costs'), readonly=True),
+        'unit_production_cost': fields.float('Unit production cost', digits_compute=dp.get_precision('Production costs'), readonly=True),
+        'unit_fixed_cost': fields.float('Unit fixed cost', digits_compute=dp.get_precision('Production costs'), readonly=True),
+        'new_standard_price': fields.float('New standard product price', digits_compute=dp.get_precision('Production costs'), readonly=True, help="New product price (only if its cost method is set to average)"),
     }
     
 mrp_production_unit_costs()
@@ -151,7 +151,7 @@ class mrp_product_produce(osv.osv_memory):
 
                 #First of all, identify the main production product between all finished products
                 main_product = False
-                finished_products = production.move_created_ids
+                finished_products = production.move_created_ids  
                 for fin_prod in finished_products:
                     qty_finished_products +=fin_prod.product_qty
                     if fin_prod.product_id.id == production.product_id.id:
@@ -160,7 +160,7 @@ class mrp_product_produce(osv.osv_memory):
                 if not main_product:
                     main_product = production
                 #Gets product stock before producing...
-                stock_before_producing = main_product.product_id.qty_available
+                
                 result = super(mrp_product_produce, self).do_produce(cr, uid, ids, context)
 
                 #Manpower cost
@@ -174,12 +174,19 @@ class mrp_product_produce(osv.osv_memory):
                 tot_production_manpower_cost = manpower_cost
                 unit_manpower_cost = tot_production_manpower_cost / production.product_qty
                 
+                qty_finished_products = 0 
+                for fin_prod in production.move_created_ids2:
+                    if fin_prod.product_id.id == production.product_id.id:
+                        qty_finished_products +=fin_prod.product_qty
+                if not qty_finished_products > 0:
+                    raise osv.except_osv(_('Error!'), _('No existen productos finalizados en la orden de producción'))
+                
                 #Material cost ((list price consumed products * qty)/sum_qty)
                 for consumed_product in production.move_lines2:
                     sum_products_cost += consumed_product.product_id.standard_price * consumed_product.product_qty
                     qty_consumed_products += consumed_product.product_qty
                 tot_products_cost = sum_products_cost
-                if not qty_finished_products: qty_finished_products = qty_consumed_products
+                #if not qty_finished_products: qty_finished_products = qty_consumed_products
                 unit_product_cost = tot_products_cost / qty_finished_products
 
                 #Fixed costs (sum of all fixed costs)
@@ -188,10 +195,14 @@ class mrp_product_produce(osv.osv_memory):
                     
                 unit_fixed_cost = sum_fixed_cost / qty_finished_products
 
+
+                stock_before_producing = main_product.product_id.qty_available - qty_finished_products
                 #Total cost (Manpower cost + material cost + fixed cost + structural cost)
                 total_production_cost = tot_production_manpower_cost + tot_products_cost + sum_fixed_cost
-                unit_production_cost = (total_production_cost / qty_finished_products) + main_product.product_id.structural_cost + unit_fixed_cost
-
+                #unit_production_cost = (total_production_cost / qty_finished_products) + main_product.product_id.structural_cost + unit_fixed_cost
+                
+                unit_production_cost = (total_production_cost / qty_finished_products) + unit_fixed_cost + unit_manpower_cost
+                
                 #New product standard price (PMP) = ((product stock before producing * standard price) + (unit_production_cost * prod_qty)) / (stock before producing + produced_qty)
                 new_product_standard_price = ((stock_before_producing * main_product.product_id.standard_price) + (unit_production_cost * qty_finished_products))/ (stock_before_producing + qty_finished_products)
 
@@ -232,8 +243,14 @@ class mrp_product_produce(osv.osv_memory):
                     vals_product = {}
                     if main_product.product_id.cost_method == 'average':
                         vals_product['standard_price'] = new_product_standard_price
+                        
+                    # Cálculo de los precios medios para actualziar ficha de producto
+                    
+                    pm_manpower_cost = ((stock_before_producing * main_product.product_id.manpower_cost) + (unit_manpower_cost * qty_finished_products))/ (stock_before_producing + qty_finished_products)
+                    pm_fixed_cost = ((stock_before_producing * main_product.product_id.other_prod_cost) + (unit_fixed_cost * qty_finished_products))/ (stock_before_producing + qty_finished_products)
 
-                    vals_product['manpower_cost'] = unit_manpower_cost
+                    vals_product['manpower_cost'] = pm_manpower_cost
+                    vals_product['other_prod_cost'] = pm_fixed_cost
 
                     self.pool.get('product.product').write(cr, uid, main_product.product_id.id, vals_product)
 

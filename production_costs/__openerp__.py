@@ -45,6 +45,7 @@
         "demo_xml" : [],
         "update_xml" : [
                 'security/ir.model.access.csv',
+		'product_cost_data.xml',
                 'product_product_view.xml',
                 'mrp_production_view.xml',
                 'production_manpower_view.xml',
