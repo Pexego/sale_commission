@@ -27,19 +27,42 @@ class pos_order(osv.osv):
     _inherit = "pos.order"
 
     _columns = {
-        'place_id': fields.many2one('pos.place', 'Lugar', required=True, readonly=False),
+        'place_id': fields.many2one('pos.place', 'Mesa', required=True, readonly=False),
     }
 
 pos_order()
 
 class pos_place(osv.osv):
     _name = 'pos.place'
-    _description = "Place in the restaurant"
+    _description = "Mesas del restaurante"
     _order = "name desc"
     
     _columns = {
-        'name': fields.char('Place Ref', size=64, required=True),
-        'price_increase': fields.float(string='Price increase', digits=(16, 2), required=False),
+        'name': fields.char('Referencia de la mesa', size=64, required=True),
+        'price_increase': fields.float(string='Incremento de precio en la mesa', digits=(16, 2), required=False),
+        'location_table': fields.boolean('Restaurante', help=u"Marque esta casilla si la mesa es de terraza."),
     }
-    
+    _defaults = {
+        'location_table': False,
+    }
 pos_place()
+
+class product_product(osv.osv):
+    _inherit = 'product.product'
+    
+    _columns = {
+        'favorite': fields.boolean('Aparecer en listado', help="Marca esta casilla para que el producto aparezca en el listado principal"),
+        
+    }
+    _defaults = {
+        'favorite': False,
+    }
+product_product()
+
+class cancel_code(osv.osv):
+    _inherit = "res.users"
+    
+    _columns = {
+        'cancel_code': fields.char('Code', size=64),
+    }
+cancel_code()

@@ -22,7 +22,7 @@
 {
         "name" : "Point of sale for restaurants",
         "description": """
-            Módulo que modifica el POS para adaptarlo a un restaurante.
+            Módulo para la conf de Django-POS  adaptado a un restaurante.
             
             """,
         "version" : "1.0",
@@ -32,9 +32,9 @@
         "depends" : [
             'point_of_sale',
                      ],
-        "init_xml" : ['restaurant_view.xml'],
+        "init_xml" : [],
         "demo_xml" : [],
-        "update_xml" : [],
+        "update_xml" : ['restaurant_view.xml',],
         "installable": True,
         'active': False
 

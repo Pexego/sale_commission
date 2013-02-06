@@ -19,41 +19,29 @@
 #
 ##############################################################################
 
-from django.core.urlresolvers import reverse
 from dajaxice.decorators import dajaxice_register
 from pos import models as posmodels
+from django.conf import settings
 
 @dajaxice_register
 def add_product_to_order_line(request, product_id, product_name, price, mesa):
     mesa = int(mesa)
     product_id = int(product_id)
     price = price.replace(",",".")
-    pos_order = posmodels.Pos_Order.objects.filter(lugar=mesa).filter(pagada=False)
-    pos_order = pos_order[0]
-    try:
-        pos_order_lines = posmodels.Pos_Order_Line.objects.filter(clave=pos_order)
-        valor= 0
-        for line in pos_order_lines:
-            if line.product_id == product_id:
-                valor=1
-                line.cantidad = (line.cantidad + 1)
-                line.save()
-        if valor == 0:
-            pos_order_line = posmodels.Pos_Order_Line(clave=pos_order)
-            pos_order_line.product_id = int(product_id)
-            pos_order_line.product_name = product_name
-            pos_order_line.cantidad = 1
-            pos_order_line.descuento = 0.0
-            pos_order_line.precio = price
-            pos_order_line.save()
-    except:
-        pos_order_line2 = posmodels.Pos_Order_Line(clave=pos_order)
-        pos_order_line2.product_id = int(product_id)
-        pos_order_line2.product_name = product_name
-        pos_order_line2.cantidad = 1
-        pos_order_line2.descuento = 0.0
-        pos_order_line2.precio = price
-        pos_order_line2.save()
+    pos_order = posmodels.Pos_Order.objects.get(lugar=mesa, pagada=False)
         
-    
-    return reverse('place', args=[mesa])
+    pos_order_lines = posmodels.Pos_Order_Line.objects.filter(clave=pos_order)
+    valor= 0
+    for line in pos_order_lines:
+        if line.product_id == product_id:
+            valor=1
+            line.cantidad = (line.cantidad + 1)
+            line.save()
+    if valor == 0:
+        pos_order_line = posmodels.Pos_Order_Line(clave=pos_order)
+        pos_order_line.product_id = int(product_id)
+        pos_order_line.product_name = product_name
+        pos_order_line.cantidad = 1
+        pos_order_line.descuento = 0.0
+        pos_order_line.precio = price
+        pos_order_line.save()

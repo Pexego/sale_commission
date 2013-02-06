@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <script language="JavaScript">
+            <!--
+            var time = null
+            function move() {
+                window.location = '/'
+            }
+            //-->
+        </script>
+        <link rel="stylesheet" href="print.css" type="text/css" media="print" />
+    </head>
+<body onload="window.print();timer=setTimeout('move()',20);">
+<div style="margin:auto;width:60%;">
+    {% if pos_order %}
+    <div class="pos-payment-container" style="background-color:white;">
+        <center>
+            <p>CASA GRANDE DE NADELA</p>
+            <p>Restaurante - Hotel</p>
+            <p>Carballeira Hosteleria, S.L.</p>
+            <p>NIF: B-27.356.609</p>
+            <p>Nadela, 50 - 27160 Lugo</p>
+            <p>Tel&eacute;fono 982 30 59 15</p>
+            <br />
+            <p>N&uacute;mero T 18271 {{ date }}</p>
+        </center>
+        <table>
+            <thead>
+                <tr>
+                        <td>Descripci&oacute;n</td>
+                        <td>Cant.</td>
+                        <td>Precio</td>
+                </tr>
+            </thead>
+            <tbody id="current-order-content">
+                <tr><td colaspan="3" style="border-top:1px solid black;"></td></tr>
+                {% for p in pos_order.products %}
+                    <tr>
+                        <td>{{ p.product_name }}</td>
+                        <td>{{ p.cantidad }}</td>
+                        <td>{{ p.precio|floatformat:2 }} &euro;</td>
+                    </tr>
+                {% endfor %}
+                    <tr><td colaspan="3" style="border-top:1px solid black;"></td></tr>
+                <tr>
+                    <td><strong>Importe</strong></td>
+                    <td>.......</td>
+                    <td><strong>{{ pos_order.total|floatformat:2 }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <p>*** Gracias por su visita ***</p>
+    </div>
+</div>
+{% endif %}
+</body>
+</html>

@@ -29,6 +29,7 @@ def log(*l,**kw):
             i=repr(i)
         out.append(i)
     out+=["%s=%r"%(k,v) for k,v in kw.items()]
+    print "LOG: ", out
     with log_lock:
         print " ".join(out)
 
@@ -41,7 +42,6 @@ def nowait():
 
 def run(l,env=None):
     log("run",l)
-    print "TYPE: ", type(l)
     env = dict(os.environ, **env) if env else None
     if isinstance(l,list):
         if env:
@@ -64,7 +64,6 @@ def kill(pid,sig=9):
         pass
 
 def run_output(l, cwd=None):
-    print "CMD: ", l
     return subprocess.Popen(l, cwd=cwd).communicate()[0]
 
 def run_and_get(l, env=None):

@@ -19,15 +19,15 @@ Installation
 ------------
 
 Requirements:
-- python: werkzeug
-- python: simplejson
-- python: coverage
+- python: coverage con easy_install
 - python: peewee
-- nginx
+- python: flask
+- python: flask-peewee
 - sqlite
 - git
 - bzr
 - hg
+- unzip
 
 Edit /etc/nginx/nginx.conf changing user by runbot's user and user group
 Edit   /etc/postgresql/8.4/main/pg_hba.conf replacing:
@@ -56,35 +56,3 @@ Typical usage resembles these lines:
 
 The first line creates some directories to hold the different branches and
 copies of the code to be run, and some configuration files.
-
-The second line actually runs the runbot specifying we want a maximum of 100
-running OpenERP instances, 4 jobs at a time, and we want to number those jobs
-starting from 220 (this information should be kept across re-run in a file in
-the future).
-
-Hacking the runbot
-------------------
-
-The runbot is written in Python and is structured as follow. (It also uses
-nginx.)
-
-There are a main thread, a web server thread, and a limited number of worker
-threads. The main thread is stuck in an infinite loop performing the same
-things all over again:
-
-  - gather Launchpad branches information
-  - copy branches data and hand them over to (freshly started) worker threads
-  - copy worker results for reporting
-  - kill older running OpenERP instances
-  - update some web pages and json files
-  - communicate with the web server (using a file and a command queue)
-
-(See the `loop()` method of the `RunBot` class in `openerprunbot.core`.)
-
-The data structures are mostly copies of the branches data. The `RunBot` class
-contains all the globals (together with `openerprunbot.__init__`, this should
-be cleaned).  The `RunBotBranch` is the base branch data itself. The
-`RunBotGroupedBranch` regroups the branches of the different OpenERP project
-sharing the same name (e.g. the trunk for the server, addons, client-web, and
-web).  The `Job` class is a copy of those data given to worker threads. Finally
-the `Point` class is a job result, used for reporting.
