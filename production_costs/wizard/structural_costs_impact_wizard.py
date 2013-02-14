@@ -77,10 +77,10 @@ class structural_costs_impact_wizard(osv.osv_memory):
                     'product_id': product_id,
                     'total_sales': distinct_sale_products[product_id],
                     'forecasted_sales': distinct_sale_products[product_id],
-                    'wizard_id': self.next_id + 1
+                    #'wizard_id': self.next_id + 1
                 }
-                line_id = struct_cost_facade.create(cr, uid, vals_product_line)
-                product_line_ids.append(line_id)
+                #line_id = struct_cost_facade.create(cr, uid, vals_product_line)
+                product_line_ids.append(vals_product_line)
 
             res['products_percent'] = product_line_ids
 
@@ -96,7 +96,7 @@ class structural_costs_impact_wizard(osv.osv_memory):
         if cost_method == 'uniform':
             for product_line in products_percent:
                 sum_forecasted_sales += product_line[2]['forecasted_sales']
-                res['cost_to_impact'] = structural_cost / sum_forecasted_sales
+            res['cost_to_impact'] = structural_cost / sum_forecasted_sales
         return {'value': res}
 
 
@@ -167,7 +167,7 @@ class structural_costs_impact_wizard(osv.osv_memory):
         'company_id': fields.many2one('res.company', 'Company')
     }
     _defaults = {
-        'prev_fyear_id': _get_previous_fiscalyear,
+        #'prev_fyear_id': _get_previous_fiscalyear,
         'company_id': lambda self, cr, uid, context: self._get_current_user_company(cr, uid, context),
         'structural_cost_method': lambda *a: 'novalid'
     }

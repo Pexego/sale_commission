@@ -53,7 +53,8 @@
                 'wizard/structural_costs_impact_wizard_view.xml',
                 'wizard/product_percent_struct_costs_view.xml',
                 'stock_move_view.xml',
-                'stock_production_lot_view.xml'
+                'stock_production_lot_view.xml',
+                'unit_costs.xml'
             ],
         "installable": True,
         'active': False

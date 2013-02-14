@@ -126,6 +126,7 @@ class mrp_production_unit_costs (osv.osv):
         'unit_production_cost': fields.float('Unit production cost', digits_compute=dp.get_precision('Production costs'), readonly=True),
         'unit_fixed_cost': fields.float('Unit fixed cost', digits_compute=dp.get_precision('Production costs'), readonly=True),
         'new_standard_price': fields.float('New standard product price', digits_compute=dp.get_precision('Production costs'), readonly=True, help="New product price (only if its cost method is set to average)"),
+        'date': fields.related('production_id', 'date_finished', type='datetime', string='DAte', store=True, readonly=True),
     }
     
 mrp_production_unit_costs()

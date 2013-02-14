@@ -112,8 +112,8 @@
         </record>
             
         
-        <record id="mrp_production_unit_costs_form_view" model="ir.ui.view">
-            <field name="name">mrp.production.unit.costs.form.view</field>
+        <record id="mrp_production_unit_costs_tree_view" model="ir.ui.view">
+            <field name="name">mrp.production.unit.costs.tree.view</field>
             <field name="model">mrp.production.unit.costs</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
