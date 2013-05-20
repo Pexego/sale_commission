@@ -229,7 +229,7 @@ class Job(object):
             cmd = [self.server_bin_path,"-d",self.db_all,"-i","base,account,stock,mrp,sale,purchase,product","--stop-after-init","--no-xmlrpc","--no-netrpc"]
             
         if self.version != "5.0":
-            cmd.append("--no-xmlrpcs","--log-level=test")
+            cmd.extend(["--no-xmlrpcs","--log-level=test"])
             
         if self.addons_path:
             cmd.append("--addons-path=" + ",".join(self.addons_path))
