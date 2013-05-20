@@ -55,7 +55,7 @@ def main():
     parser.add_option("--number", metavar="NUMBER", default=16, help="max concurrent instance to run (%default)")
     parser.add_option("--test", metavar="INT", default=1, help="run tests flag (%default)")
     parser.add_option("--start-job-id", metavar="INT", default=0, help="initial job id (%default)")
-    parser.add_option("--debug", action="store_true", help="ease debugging by e.g. limiting branches")
+    parser.add_option("--debug", action="store_true", default=0, help="ease debugging by e.g. limiting branches")
     
     o, a = parser.parse_args(sys.argv)
     if o.init:

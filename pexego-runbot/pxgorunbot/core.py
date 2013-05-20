@@ -203,6 +203,7 @@ class Job(object):
             cmd.extend(["--no-xmlrpcs","--log-level=test"])
         if self.addons_path:
             cmd.append("--addons-path=" + ",".join(self.addons_path))
+            
         _has_test_enable_flag = False
         if has_test_enable_flag(self.server_bin_path):
             cmd.append("--test-enable")
@@ -280,7 +281,6 @@ class Job(object):
         log.error_level = "INFO"
         tools.csrf.on = False
         tools.log_tracebacks.on = False
-        tools.cgitb.on = True
         openerp.server.host = 'localhost'
         openerp.server.port = '%d'
         openerp.server.protocol = 'socket'
