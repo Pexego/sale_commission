@@ -9,6 +9,7 @@ import time
 import traceback
 import copy
 import models
+from app import app
 
 import pxgorunbot
 from pxgorunbot.misc import *
@@ -53,7 +54,7 @@ class Job(object):
         self.version = project.version
         self.debug = debug
         self.db_path = db_path
-
+        
         self.repo_updates = project.repo_updates()
         self.port = port
         self.test = test
@@ -446,7 +447,8 @@ class RunbotProject(object):
         self.downloads_url = project.downloads
         self.runbot_downloads = []
         self.modules = project.modules
-
+        
+        
         self.server = None
         self.client_web = None
         self.web = None
@@ -503,6 +505,8 @@ class RunbotProject(object):
     def create_project(self):
         log("runbot-create-project")
         repo = os.path.join(self.runbot.wd, 'repo')
+        if not os.path.exists(repo+'/'+self.name):
+            os.mkdir(repo+'/'+self.name)
         repo = os.path.join(repo, self.name)
         if not self.server:
             path = os.path.join(repo, '__configured_' + self.name + '_server')
@@ -582,6 +586,8 @@ class RunBot(object):
         self.current_job_id = current_job_id
         self.debug = debug
         self.manual_build_count = 0
+        
+        self.my_domain = app.config.get('MY_DOMAIN')
 
     def populate_projects(self):
         for project in models.Project.select():
@@ -723,7 +729,7 @@ class RunBot(object):
                 if not manage:
                     port = self.allocate_port()
                     self.current_job_id += 1
-                    job = Job(p, port, self.test, self.current_job_id, self.debug, p.name)
+                    job = Job(p, port, self.test, self.current_job_id, self.debug, p.name, db_path=p.db_path, custom_addons=[a.path for a in p.runbot_addons if a.custom], modules=p.modules) 
                     p.add_point(job)
                     p.need_run_reason = []
                     p.manual_build = sys.maxint

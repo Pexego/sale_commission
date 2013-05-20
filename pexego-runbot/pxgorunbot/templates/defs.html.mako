@@ -11,9 +11,9 @@
             Install logs (ongoing)
         % endif
         </a></li>
-        <li><a href="/static/${p.subdomain}/logs/coverage-all/index.html">Code coverage</a></li>
-        <li><a href="/static/${p.subdomain}/logs/server.txt">Server logs</a></li>
-        <li><a href="/static/${p.subdomain}/logs/client-web.txt">Web logs</a></li>
+        <li><a target="_blank" href="/static/${p.subdomain}/logs/coverage-all/index.html">Code coverage</a></li>
+        <li><a target="_blank" href="/static/${p.subdomain}/logs/server.txt">Server logs</a></li>
+        <li><a target="_blank" href="/static/${p.subdomain}/logs/client-web.txt">Web logs</a></li>
         <li>NET-RPC port: ${r.server_net_port+p.port}</li>
         <li>XML-RPC port: ${r.server_xml_port+p.port}</li>
         % if 'build' in p.need_run_reason:

@@ -5,8 +5,10 @@ import ConfigParser
 from app import app
 import os
 import sys
-
+from auth import auth
+    
 @app.route('/')
+@auth.login_required
 def index():
     return render_template("index.html")
 
