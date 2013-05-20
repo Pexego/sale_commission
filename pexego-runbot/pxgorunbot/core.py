@@ -198,9 +198,9 @@ class Job(object):
 
     def start_test_base(self):
         log("job-start-server-base")
-        cmd = [self.server_bin_path,"-d",self.db,"-i","base","--stop-after-init","--no-xmlrpc","--no-netrpc","--log-level=test"]
+        cmd = [self.server_bin_path,"-d",self.db,"-i","base","--stop-after-init","--no-xmlrpc","--no-netrpc"]
         if self.version != '5.0':
-            cmd.append("--no-xmlrpcs")
+            cmd.extend(["--no-xmlrpcs","--log-level=test"])
         if self.addons_path:
             cmd.append("--addons-path=" + ",".join(self.addons_path))
         _has_test_enable_flag = False
