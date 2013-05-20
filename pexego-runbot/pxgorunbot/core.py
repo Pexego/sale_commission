@@ -129,7 +129,7 @@ class Job(object):
         self.completed_time = 0
         self.completed = False
         
-        if self.version != "6.0":
+        if self.version not in ["6.0","5.0"]:
             self.addons_path = self.fill_addons_path()
         else:
             self.addons_path = False
@@ -193,7 +193,7 @@ class Job(object):
     def resolve_server_bin_path(self):
         # This can be done only if the files are present otherwise the if
         # will always fail. Alternatively, server_bin_path could be a property.
-        if not os.path.exists(self.server_bin_path): # for 6.0 branches
+        if not os.path.exists(self.server_bin_path): # for 6.0 and 5.0 branches
             self.server_bin_path=os.path.join(self.server_path,"bin","openerp-server.py")
 
     def start_test_base(self):
