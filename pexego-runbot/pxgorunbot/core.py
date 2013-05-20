@@ -198,7 +198,9 @@ class Job(object):
 
     def start_test_base(self):
         log("job-start-server-base")
-        cmd = [self.server_bin_path,"-d",self.db,"-i","base","--stop-after-init","--no-xmlrpc","--no-xmlrpcs","--no-netrpc","--log-level=test"]
+        cmd = [self.server_bin_path,"-d",self.db,"-i","base","--stop-after-init","--no-xmlrpc","--no-netrpc","--log-level=test"]
+        if self.version != '5.0':
+            cmd.append("--no-xmlrpcs")
         if self.addons_path:
             cmd.append("--addons-path=" + ",".join(self.addons_path))
         _has_test_enable_flag = False
@@ -247,9 +249,11 @@ class Job(object):
     def start_server(self):
         port = self.port
         log("job-start-server",branch=self.name,port=port)
-        cmd=[self.server_bin_path,"--netrpc-port=%d"%(self.server_net_port+port),"--xmlrpc-port=%d"%(self.server_xml_port+port)]
+        cmd=[self.server_bin_path]
         if self.version != "5.0":
-            cmd.append("--no-xmlrpcs")
+            cmd.extend(["--no-xmlrpcs","--netrpc-port=%d"%(self.server_net_port+port),"--xmlrpc-port=%d"%(self.server_xml_port+port)])
+        else:
+            cmd.extend(["--net_port=%d"%(self.server_net_port+port),"--port=%d"%(self.server_xml_port+port)])
         if self.addons_path:
             cmd.append("--addons-path=" + ",".join(self.addons_path))
         if os.path.exists(os.path.join(self.server_path, 'openerp', 'wsgi.py')) \
