@@ -222,14 +222,14 @@ class Job(object):
         log("job-start-server-all")
         if self.db_path:
             run(["psql","-d",self.db_all,"-f",self.db_path])
-            cmd = [self.server_bin_path,"-d",self.db_all,"--update=all","--stop-after-init","--no-xmlrpc","--no-netrpc","--log-level=test",]
+            cmd = [self.server_bin_path,"-d",self.db_all,"--update=all","--stop-after-init","--no-xmlrpc","--no-netrpc"]
         elif self.modules:
-            cmd = [self.server_bin_path,"-d",self.db_all,"-i",self.modules,"--stop-after-init","--no-xmlrpc","--no-netrpc","--log-level=test"]
+            cmd = [self.server_bin_path,"-d",self.db_all,"-i",self.modules,"--stop-after-init","--no-xmlrpc","--no-netrpc"]
         else:
-            cmd = [self.server_bin_path,"-d",self.db_all,"-i","base,account,stock,mrp,sale,purchase,product","--stop-after-init","--no-xmlrpc","--no-netrpc","--log-level=test"]
+            cmd = [self.server_bin_path,"-d",self.db_all,"-i","base,account,stock,mrp,sale,purchase,product","--stop-after-init","--no-xmlrpc","--no-netrpc"]
             
         if self.version != "5.0":
-            cmd.append("--no-xmlrpcs")
+            cmd.append("--no-xmlrpcs","--log-level=test")
             
         if self.addons_path:
             cmd.append("--addons-path=" + ",".join(self.addons_path))
