@@ -8,6 +8,17 @@ from models import User, Project, Download, Addon
 class UserAdmin(ModelAdmin):
     columns = ('username', 'email', 'admin',)
     
+    def save_model(self, instance, form, adding=False):
+        """
+        @see https://github.com/coleifer/flask-peewee/blob/master/flask_peewee/auth.py#L58
+        """
+        orig_password = instance.password
+        user = super(UserAdmin, self).save_model(instance, form, adding)
+        if orig_password != form.password.data:
+            user.set_password(form.password.data)
+            user.save()
+        return user
+    
 class ProjectAdmin(ModelAdmin):
     columns = ('name', 'version',)
     

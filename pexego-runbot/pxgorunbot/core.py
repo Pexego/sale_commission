@@ -295,7 +295,9 @@ class Job(object):
         company.url = ''
         """%(self.client_web_port+port,self.server_net_port+port,self.server_net_port+port)
         config=config.replace("\n        ","\n")
-        cfgs = [os.path.join(self.client_web_path,"doc","openerp-web.cfg"), os.path.join(self.client_web_path,"openerp-web.cfg"), os.path.join(self.client_web_path,"config","openerp-web.cfg")]
+        cfgs = [os.path.join(self.client_web_path,"doc","openerp-web.cfg"), os.path.join(self.client_web_path,"openerp-web.cfg")]
+        if os.path.exists(os.path.join(self.client_web_path,"config")):
+            cfgs.append(os.path.join(self.client_web_path,"config","openerp-web.cfg"))
         for i in cfgs:
             f=open(i,"w")
             f.write(config)
