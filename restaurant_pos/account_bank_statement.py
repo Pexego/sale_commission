@@ -19,9 +19,21 @@
 #
 ##############################################################################
 
-import account_bank_statement
-import restaurant
-import pos_receipt
-import invoice
-import wizard
-import report
+from osv import fields, osv
+
+class account_journal(osv.Model):
+    _inherit = 'account.journal'
+    _columns = {
+        'zone_id' : fields.many2one('pos.category_place', 'Area'),     
+    }
+
+account_journal()
+
+class account_cash_statement(osv.Model):
+    _inherit = "account.bank.statement"
+    
+    _columns = {
+        'user_open': fields.many2one('res.users', 'Opened cash'),
+        'user_close': fields.many2one('res.users', 'Closed cash'),
+    }
+account_cash_statement()

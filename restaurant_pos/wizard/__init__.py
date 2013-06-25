@@ -19,9 +19,6 @@
 #
 ##############################################################################
 
-import account_bank_statement
-import restaurant
-import pos_receipt
-import invoice
-import wizard
-import report
+import pos_open_statement
+import pos_close_statement
+

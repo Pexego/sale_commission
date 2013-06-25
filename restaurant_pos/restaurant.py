@@ -20,49 +20,71 @@
 ##############################################################################
 
 from osv import osv, fields
-from tools import ustr
+from tools.translate import _
 
-class pos_order(osv.osv):
-    """ Modificaciones de sale order para añadir la posibilidad de versionar el pedido de venta. """
+class pos_order(osv.Model):
+    """ Modificaciones de pos order para indicar la mesa de facturacion. """
     _inherit = "pos.order"
 
     _columns = {
-        'place_id': fields.many2one('pos.place', 'Mesa', required=True, readonly=False),
+        'zone_id': fields.many2one('pos.category_place', 'Area', 
+        required=True, readonly=False),
+        'place_id': fields.many2one('pos.place', 'Table or room', 
+        required=True, readonly=False),
     }
 
 pos_order()
 
-class pos_place(osv.osv):
-    _name = 'pos.place'
-    _description = "Mesas del restaurante"
+class pos_category_place(osv.Model):
+    _name = 'pos.category_place'
+    _description = "Information Area"
     _order = "name desc"
     
     _columns = {
-        'name': fields.char('Referencia de la mesa', size=64, required=True),
-        'price_increase': fields.float(string='Incremento de precio en la mesa', digits=(16, 2), required=False),
-        'location_table': fields.boolean('Restaurante', help=u"Marque esta casilla si la mesa es de terraza."),
+        'sequence': fields.integer('Order', select=True),
+        'name': fields.char('Name', size=64, required=True),   
+        'sale_journal_id' : fields.many2one('account.journal',
+         'Invoice Journal'),     
+        'sale_simple_journal_id' : fields.many2one('account.journal',
+         'Journal simplified billing'),
+        'journal_ids': fields.one2many('account.journal', 'zone_id', 
+        string='Daily payment', domain=[('type','in',['cash', 'bank'])]),
+        'printer': fields.char('Printer', size=64,
+         help=_("Nombre de la impresora por la que se va imprimir.")),
+        'ticket': fields.boolean('Ticket format?'),
+        'imagen': fields.binary('Image'),
     }
-    _defaults = {
-        'location_table': False,
+
+pos_category_place()
+
+class pos_place(osv.Model):
+    _name = 'pos.place'
+    _description = "Table or room"
+    _order = "name desc"
+    
+    _columns = {
+        'name': fields.char('Reference', size=64, required=True),
+        'category' : fields.many2one('pos.category_place', 'Area'),
+        'imagen': fields.binary('Image'),
     }
 pos_place()
 
-class product_product(osv.osv):
+class product_product(osv.Model):
     _inherit = 'product.product'
     
     _columns = {
-        'favorite': fields.boolean('Aparecer en listado', help="Marca esta casilla para que el producto aparezca en el listado principal"),
-        
-    }
-    _defaults = {
-        'favorite': False,
+        'category' : fields.many2one('pos.category_place',
+         'Appear in the initial list of'),
     }
 product_product()
 
-class cancel_code(osv.osv):
+class cancel_code(osv.Model):
     _inherit = "res.users"
     
     _columns = {
-        'cancel_code': fields.char('Code', size=64),
+        'pos_code': fields.integer('Code', size=64),
     }
+    _sql_constraints = [('pos_code_uniq','unique(pos_code)',
+     'POS code number must be unique!')]
+    
 cancel_code()
