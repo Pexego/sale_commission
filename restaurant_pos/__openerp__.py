@@ -22,11 +22,10 @@
 {
         "name" : "Point of sale for restaurants",
         "description": """
-            Módulo para la conf de Django-POS  adaptado a un restaurante.
-            
+            Módulo para la conf de Django-POS adaptado a un pequeño hotel restaurante.
             """,
-        "version" : "1.0",
-        "author" : "Pexego",
+        "version" : "2.0",
+        "author" : "Alejandro Núñez - Pexego S.L",
         "website" : "http://www.pexego.es",
         "category" : "Point Of Sale/Restaurant",
         "depends" : [
@@ -34,7 +33,10 @@
                      ],
         "init_xml" : [],
         "demo_xml" : [],
-        "update_xml" : ['restaurant_view.xml',],
+        "update_xml" : ['restaurant_view.xml',
+                        'account_statement_view.xml',
+                        'invoice_view.xml',
+                        'security/ir.model.access.csv'],
         "installable": True,
         'active': False
 

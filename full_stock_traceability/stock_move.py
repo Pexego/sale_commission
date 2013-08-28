@@ -90,7 +90,7 @@ class stock_move(osv.osv):
         return res
 
     _columns = {
-            'supplier': fields.function(_get_supplier, method=True, string="Supplier", type='char', size=64, store = True),
+            'supplier': fields.function(_get_supplier, method=True, string="Supplier", type='char', size=255, store = True),
             'expiry_date': fields.related('prodlot_id', 'life_date', string='Expiry date', readonly=True, type='datetime'),
             'consumed_date': fields.datetime('Consumed date'),
             'virtual' : fields.boolean('Virtual Move', help="A virtual move, is an internal move necessary for follow-up the traceability")

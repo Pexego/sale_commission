@@ -386,8 +386,8 @@ button.primary:active {
     .pane table td {
       position: relative; }
   .pane .dropdown-menu {
-    top: 24px;
-    right: -116px;
+    /*top: 24px;*/
+    right: 216px;
     padding: 4px;
     border: 1px solid #afafb6;
     width: 150px;

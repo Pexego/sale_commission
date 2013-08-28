@@ -5,3 +5,5 @@ class Config(object):
     DATABASE = {'engine': 'peewee.SqliteDatabase',
                 'name': 'runbot.db'}
     SEND_FILE_MAX_AGE_DEFAULT = 60
+    
+    MY_DOMAIN = "runbot.pexego.es"

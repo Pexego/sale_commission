@@ -9,6 +9,7 @@ import time
 import traceback
 import copy
 import models
+from app import app
 
 import pxgorunbot
 from pxgorunbot.misc import *
@@ -53,7 +54,7 @@ class Job(object):
         self.version = project.version
         self.debug = debug
         self.db_path = db_path
-
+        
         self.repo_updates = project.repo_updates()
         self.port = port
         self.test = test
@@ -128,7 +129,7 @@ class Job(object):
         self.completed_time = 0
         self.completed = False
         
-        if self.version != "6.0":
+        if self.version not in ["6.0","5.0"]:
             self.addons_path = self.fill_addons_path()
         else:
             self.addons_path = False
@@ -192,14 +193,17 @@ class Job(object):
     def resolve_server_bin_path(self):
         # This can be done only if the files are present otherwise the if
         # will always fail. Alternatively, server_bin_path could be a property.
-        if not os.path.exists(self.server_bin_path): # for 6.0 branches
+        if not os.path.exists(self.server_bin_path): # for 6.0 and 5.0 branches
             self.server_bin_path=os.path.join(self.server_path,"bin","openerp-server.py")
 
     def start_test_base(self):
         log("job-start-server-base")
-        cmd = [self.server_bin_path,"-d",self.db,"-i","base","--stop-after-init","--no-xmlrpc","--no-xmlrpcs","--no-netrpc","--log-level=test"]
+        cmd = [self.server_bin_path,"-d",self.db,"-i","base","--stop-after-init","--no-xmlrpc","--no-netrpc"]
+        if self.version != '5.0':
+            cmd.extend(["--no-xmlrpcs","--log-level=test"])
         if self.addons_path:
             cmd.append("--addons-path=" + ",".join(self.addons_path))
+            
         _has_test_enable_flag = False
         if has_test_enable_flag(self.server_bin_path):
             cmd.append("--test-enable")
@@ -218,11 +222,14 @@ class Job(object):
         log("job-start-server-all")
         if self.db_path:
             run(["psql","-d",self.db_all,"-f",self.db_path])
-            cmd = [self.server_bin_path,"-d",self.db_all,"--update=all","--stop-after-init","--no-xmlrpc","--no-xmlrpcs","--no-netrpc","--log-level=test",]
+            cmd = [self.server_bin_path,"-d",self.db_all,"--update=all","--stop-after-init","--no-xmlrpc","--no-netrpc"]
         elif self.modules:
-            cmd = [self.server_bin_path,"-d",self.db_all,"-i",self.modules,"--stop-after-init","--no-xmlrpc","--no-xmlrpcs","--no-netrpc","--log-level=test"]
+            cmd = [self.server_bin_path,"-d",self.db_all,"-i",self.modules,"--stop-after-init","--no-xmlrpc","--no-netrpc"]
         else:
-            cmd = [self.server_bin_path,"-d",self.db_all,"-i","base,account,stock,mrp,sale,purchase,product","--stop-after-init","--no-xmlrpc","--no-xmlrpcs","--no-netrpc","--log-level=test"]
+            cmd = [self.server_bin_path,"-d",self.db_all,"-i","base,account,stock,mrp,sale,purchase,product","--stop-after-init","--no-xmlrpc","--no-netrpc"]
+            
+        if self.version != "5.0":
+            cmd.extend(["--no-xmlrpcs","--log-level=test"])
             
         if self.addons_path:
             cmd.append("--addons-path=" + ",".join(self.addons_path))
@@ -243,7 +250,11 @@ class Job(object):
     def start_server(self):
         port = self.port
         log("job-start-server",branch=self.name,port=port)
-        cmd=[self.server_bin_path,"--no-xmlrpcs","--netrpc-port=%d"%(self.server_net_port+port),"--xmlrpc-port=%d"%(self.server_xml_port+port)]
+        cmd=[self.server_bin_path]
+        if self.version != "5.0":
+            cmd.extend(["--no-xmlrpcs","--netrpc-port=%d"%(self.server_net_port+port),"--xmlrpc-port=%d"%(self.server_xml_port+port)])
+        else:
+            cmd.extend(["--net_port=%d"%(self.server_net_port+port),"--port=%d"%(self.server_xml_port+port)])
         if self.addons_path:
             cmd.append("--addons-path=" + ",".join(self.addons_path))
         if os.path.exists(os.path.join(self.server_path, 'openerp', 'wsgi.py')) \
@@ -270,22 +281,23 @@ class Job(object):
         log.error_level = "INFO"
         tools.csrf.on = False
         tools.log_tracebacks.on = False
-        tools.cgitb.on = True
         openerp.server.host = 'localhost'
         openerp.server.port = '%d'
         openerp.server.protocol = 'socket'
         openerp.server.timeout = 450
+        [openerp]
+        host = 'localhost'
+        port = '%d'
+        protocol = 'socket'
         [openerp-web]
         #dblist.filter = 'BOTH'
         dbbutton.visible = True
         company.url = ''
-        openerp.server.host = 'localhost'
-        openerp.server.port = '%d'
-        openerp.server.protocol = 'socket'
-        openerp.server.timeout = 450
         """%(self.client_web_port+port,self.server_net_port+port,self.server_net_port+port)
         config=config.replace("\n        ","\n")
         cfgs = [os.path.join(self.client_web_path,"doc","openerp-web.cfg"), os.path.join(self.client_web_path,"openerp-web.cfg")]
+        if os.path.exists(os.path.join(self.client_web_path,"config")):
+            cfgs.append(os.path.join(self.client_web_path,"config","openerp-web.cfg"))
         for i in cfgs:
             f=open(i,"w")
             f.write(config)
@@ -446,7 +458,8 @@ class RunbotProject(object):
         self.downloads_url = project.downloads
         self.runbot_downloads = []
         self.modules = project.modules
-
+        
+        
         self.server = None
         self.client_web = None
         self.web = None
@@ -503,6 +516,8 @@ class RunbotProject(object):
     def create_project(self):
         log("runbot-create-project")
         repo = os.path.join(self.runbot.wd, 'repo')
+        if not os.path.exists(repo+'/'+self.name):
+            os.mkdir(repo+'/'+self.name)
         repo = os.path.join(repo, self.name)
         if not self.server:
             path = os.path.join(repo, '__configured_' + self.name + '_server')
@@ -582,6 +597,8 @@ class RunBot(object):
         self.current_job_id = current_job_id
         self.debug = debug
         self.manual_build_count = 0
+        
+        self.my_domain = app.config.get('MY_DOMAIN')
 
     def populate_projects(self):
         for project in models.Project.select():
@@ -723,7 +740,7 @@ class RunBot(object):
                 if not manage:
                     port = self.allocate_port()
                     self.current_job_id += 1
-                    job = Job(p, port, self.test, self.current_job_id, self.debug, p.name)
+                    job = Job(p, port, self.test, self.current_job_id, self.debug, p.name, db_path=p.db_path, custom_addons=[a.path for a in p.runbot_addons if a.custom], modules=p.modules) 
                     p.add_point(job)
                     p.need_run_reason = []
                     p.manual_build = sys.maxint
