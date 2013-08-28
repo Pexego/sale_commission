@@ -27,6 +27,7 @@ from tools.translate import _
 
 class sale_order_agent(osv.osv):
     _name = "sale.order.agent"
+    _rec_name = "agent_id"
 
     def name_get(self, cr, uid, ids, context=None):
         """devuelve como nombre del agente del partner el nombre del agente"""
