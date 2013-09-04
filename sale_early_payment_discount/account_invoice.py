@@ -217,7 +217,7 @@ class account_invoice(osv.osv):
             return {'value': res}
         
         res['date_due'] =  False
-                })
+        
         early_discs = self.pool.get('account.partner.payment.term.early.discount').search(cr, uid, [('partner_id', '=', part), ('payment_term_id', '=', payment_term)])
         if early_discs:
             res['early_payment_discount'] = self.pool.get('account.partner.payment.term.early.discount').browse(cr, uid, early_discs[0]).early_payment_discount
