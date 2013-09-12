@@ -29,7 +29,7 @@
                     """,
     "version" : "1.0",
     "author" : "Pexego",
-    "depends" : ["base","product","account","sale","decimal_precision"],
+    "depends" : ["base","product","account","sale","decimal_precision","nan_account_extension"],
     "category" : "Enterprise Specific Modules",
     "init_xml" : [],
     "update_xml" : ['security/ir.model.access.csv',
