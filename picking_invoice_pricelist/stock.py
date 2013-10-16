@@ -26,17 +26,13 @@ class stock_picking(osv.osv):
     _inherit = 'stock.picking'
 
     def _get_price_unit_invoice(self, cursor, user, move_line, type):
-        print type
-        print "OK WAY"
         if not move_line.sale_line_id and not  move_line.purchase_line_id:
             if not move_line.picking_id.address_id:
                 return super(stock_picking, self)._get_price_unit_invoice(cursor, user, move_line, type)
             if type == 'out_invoice':
                 pricelist = move_line.picking_id.address_id.partner_id.property_product_pricelist and move_line.picking_id.address_id.partner_id.property_product_pricelist.id or False 
             else:
-                print "compra"
                 pricelist = move_line.picking_id.address_id.partner_id.property_product_pricelist_purchase and move_line.picking_id.address_id.partner_id.property_product_pricelist_purchase.id or False
-            print pricelist
             price = self.pool.get('product.pricelist').price_get(cursor, user, [pricelist],
                     move_line.product_id.id, move_line.product_qty or 1.0, move_line.picking_id.address_id.partner_id.id, {
                         'uom': move_line.product_uom.id,
