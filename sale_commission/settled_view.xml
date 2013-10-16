@@ -170,6 +170,7 @@
                     <field name="invoice_number"/>
                     <field name="invoice_id" invisible="1"/>
                     <field name="invoice_date"/>
+                    <field name="partner_id"/>
                     <field name="invoice_amount"/>
                     <field name="settled_amount" sum="Settled total"/>
                     <!--field name="currency_id"/-->
@@ -189,6 +190,7 @@
                         <field name="agent_id"/>
                         <field name="invoice_number"/>
                         <field name="invoice_date"/>
+                        <field name="partner_id"/>
                         <field name="invoice_amount"/>
                         <field name="settled_amount"/>
                     </group>

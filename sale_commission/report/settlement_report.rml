@@ -185,13 +185,16 @@
     <para style="terp_default_5cm_Above_Space">
         <font color="white"> </font>
     </para>
-    <blockTable colWidths="135.0,135.0,124.0,120.0" style="Header_Order_Reference_Tbl">
+    <blockTable colWidths="70.0,90.0,130.0,114.0,110.0" style="Header_Order_Reference_Tbl">
       <tr>
         <td>
           <para style="terp_tblheader_General_Centre">INVOICE NO [[not agent.invoices and removeParentNode('blockTable')]]</para>
         </td>
         <td>
           <para style="terp_tblheader_General_Centre">INVOICE DATE</para>
+        </td>
+                <td>
+          <para style="terp_tblheader_General_Centre">PARTNER</para>
         </td>
         <td>
           <para style="terp_tblheader_General_Centre">AMOUNT INVOICED</para>
@@ -204,13 +207,16 @@
 
     <section>
     <para style="terp_default_80">[[repeatIn(agent.invoices,'invoice')]]</para>
-    <blockTable colWidths="135.0,135.0,124.0,120.0" style="Content_Order_Reference_Table">
+    <blockTable colWidths="70.0,90.0,130.0,114.0,110.0" style="Content_Order_Reference_Table">
       <tr>
         <td>
           <para style="terp_default_Centre_8">[[ invoice.invoice_number or '' ]]</para>
         </td>
         <td>
           <para style="terp_default_Centre_8">[[ invoice.invoice_date or '' ]]</para>
+        </td>
+        <td>
+          <para style="terp_default_Centre_8">[[ invoice.partner_id.name or '' ]]</para>
         </td>
         <td>
           <para style="terp_default_Centre_8">[[ formatLang(invoice.invoice_amount or 0.0) ]] [[ invoice.currency_id and invoice.currency_id.code or '']]</para>

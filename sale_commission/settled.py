@@ -459,6 +459,7 @@ class settled_invoice_agent(osv.osv):
     _auto = False
     _columns = {
         'agent_id':fields.many2one('sale.agent', 'Agent', readonly=True, select=1),
+        'partner_id':fields.many2one('res.partner', 'Partner', readonly=True, select=1),
         'invoice_id': fields.many2one('account.invoice', 'Invoice', readonly=True, select=1),
         'settlement_agent_id': fields.many2one('settlement.agent', 'Agent settl.', readonly=True, select=1, ondelete="cascade"),
         'invoice_number':fields.related('invoice_id', 'number', type='char', string='Invoice no', readonly=True ),
@@ -475,12 +476,13 @@ class settled_invoice_agent(osv.osv):
         cr.execute("""
             create or replace view settled_invoice_agent as (
             SELECT  (account_invoice_line.invoice_id*10000+settlement_agent.agent_id) as id, settlement_agent.id as settlement_agent_id,
-            account_invoice_line.invoice_id as invoice_id, settlement_agent.agent_id as agent_id,
+            account_invoice_line.invoice_id as invoice_id, settlement_agent.agent_id as agent_id, MAX(account_invoice.partner_id) as partner_id,
             sum(settlement_line.amount) as invoice_amount,
             sum(settlement_line.commission) as settled_amount
             FROM settlement_agent
               INNER JOIN settlement_line ON settlement_agent.id = settlement_line.settlement_agent_id
               INNER JOIN account_invoice_line ON account_invoice_line.id = settlement_line.invoice_line_id
+              INNER JOIN account_invoice ON account_invoice.id = account_invoice_line.invoice_id
               GROUP BY account_invoice_line.invoice_id, settlement_agent.agent_id, settlement_agent.id
 
            )""")
