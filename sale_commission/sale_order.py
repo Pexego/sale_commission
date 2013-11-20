@@ -80,36 +80,15 @@ class sale_order(osv.osv):
         'sale_agent_ids':fields.one2many('sale.order.agent', 'sale_id', 'Agents', states={'draft': [('readonly', False)]})
     }
 
-    def create(self, cr, uid, values, context=None):
-        """
-        """
-        res = super(sale_order, self).create(cr, uid, values, context=context)
-        if 'sale_agent_ids' in values:
-            for sale_order_agent in values['sale_agent_ids']:
-                self.pool.get('sale.order.agent').write(cr, uid, sale_order_agent[1], {'sale_id':res})
-        return res
-
-    def write(self, cr, uid, ids, values, context=None):
-        """
-        """
-
-        if 'sale_agent_ids' in values:
-            for sale_order_agent in values['sale_agent_ids']:
-                for id in ids:
-                    if sale_order_agent[2]:
-                        sale_order_agent[2]['sale_id']=id
-                    else:
-                        self.pool.get('sale.order.agent').unlink(cr, uid, sale_order_agent[1])
-        return super(sale_order, self).write(cr, uid, ids, values, context=context)
 
     def onchange_partner_id(self, cr, uid, ids, part):
         """heredamos el evento de cambio del campo partner_id para actualizar el campo agent_id"""
         sale_agent_ids=[]
         res = super(sale_order, self).onchange_partner_id(cr, uid, ids, part)
+        sale_order_agent = self.pool.get('sale.order.agent')
+        if ids:
+            sale_order_agent.unlink(cr, uid, sale_order_agent.search(cr, uid ,[('sale_id','=',ids)]))
         if res.get('value', False) and part:
-            sale_order_agent = self.pool.get('sale.order.agent')
-            if ids:
-                sale_order_agent.unlink(cr, uid, sale_order_agent.search(cr, uid ,[('sale_id','=',ids)]))
             partner = self.pool.get('res.partner').browse(cr, uid, part)
             for partner_agent in partner.commission_ids:
                 vals={
