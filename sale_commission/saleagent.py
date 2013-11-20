@@ -32,7 +32,8 @@ class commission(osv.osv):
         'name': fields.char('Name', size=64, required=True),
         'type': fields.selection((('fijo', 'Fix percentage'), ('tramos', 'By sections')), 'Type', required=True),
         'fix_qty': fields.float('Fix Percentage'),
-        'sections': fields.one2many('commission.section', 'commission_id', 'Sections')
+        'sections': fields.one2many('commission.section', 'commission_id', 'Sections'),
+        'product_agent_ids':fields.one2many('product.agent.commission', 'commission_id', 'Agents')
     }
     _defaults = {
         'type' : lambda *a: 'fijo',

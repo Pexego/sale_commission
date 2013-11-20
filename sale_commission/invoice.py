@@ -31,7 +31,7 @@ class invoice_line_agent(osv.osv):
     _name = "invoice.line.agent"
 
     _columns = {
-        'invoice_line_id':fields.many2one('account.invoice.line', 'Invoice Line', required=True, ondelete='cascade', help=''),
+        'invoice_line_id':fields.many2one('account.invoice.line', 'Invoice Line', required=False, ondelete='cascade', help=''),
         'invoice_id':fields.related('invoice_line_id', 'invoice_id', type='many2one', relation='account.invoice', string='Invoice'),
         'invoice_date':fields.related('invoice_id',type='date_invoice', readonly=True),
         'agent_id': fields.many2one('sale.agent', 'Agent', required=True, ondelete='cascade', help=''),

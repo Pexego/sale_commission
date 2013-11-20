@@ -2,19 +2,6 @@
 <openerp>
     <data>
 
-        <!--record id="view_order_comm_tree" model="ir.ui.view">
-            <field name="name">sale.order.comm.tree</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_tree"/>
-            <field name="type">tree</field>
-            <field name="arch" type="xml">
-                    <field name="partner_shipping_id" position="after">
-                        <field name="agent_code" select="2"/>
-                        <field name="country" select="2"/>
-                    </field>
-            </field>
-        </record-->
-
         <record id="view_order_agent_form_inherit" model="ir.ui.view">
             <field name="name">sale.agent.order.inherit.form</field>
             <field name="model">sale.order</field>
@@ -32,6 +19,19 @@
                         </field>
                     </group>
                 </field>
+                 <xpath expr="//field[@name='order_line']/form/notebook/page[@string='History']" position="after">
+                    <page string='Agents and Commisions'>
+                        <field name="line_agent_ids" nolabel="1" colspan="4">
+                            <tree string="Agents and Commissions" editable="top">
+                                <field name="agent_id" on_change="onchange_agent_id(agent_id)" />
+                                <field name="commission_id" on_change="onchange_commission_id(agent_id,commission_id)"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form/notebook/page[@string='Order Line']/group[1]/field[@name='product_id']" position="replace">
+                     <field colspan="3" context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'shop':parent.shop_id, 'uom':product_uom, 'force_product_uom': True,'order_id': parent.id}" name="product_id" on_change="product_id_change(parent.pricelist_id,product_id,product_uom_qty,product_uom,product_uos_qty,product_uos,name,parent.partner_id, False, True, parent.date_order, product_packaging, parent.fiscal_position, False, context)"/>
+                </xpath>
             </field>
         </record>
 
