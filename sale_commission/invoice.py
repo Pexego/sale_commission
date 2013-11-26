@@ -45,6 +45,12 @@ class invoice_line_agent(osv.osv):
      }
 
 
+    def copy_data(self, cr, uid, id, default=None, context=None):
+        if not default:
+            default = {}
+        default.update({'settled': False})
+        return super(invoice_line_agent, self).copy_data(cr, uid, id, default, context=context)
+
     def calculate_commission (self, cr, uid, ids):
         for line_agent in self.browse(cr,uid,ids):
              if  line_agent.commission_id.type == 'fijo' and line_agent.commission_id.fix_qty:

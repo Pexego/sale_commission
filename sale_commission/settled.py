@@ -141,13 +141,13 @@ class settlement (osv.osv):
         'state': lambda *a: 'settled'
     }
 
-    def action_invoice_create(self, cursor, user, ids, journal_id, product_id, context=None):
+    def action_invoice_create(self, cursor, user, ids, journal_id, product_id,mode,context=None):
 
         agents_pool=self.pool.get('settlement.agent')
         res={}
         for settlement in self.browse(cursor, user, ids, context=context):
             settlement_agent_ids = map(lambda x: x.id, settlement.settlement_agent_id)
-            invoices_agent = agents_pool.action_invoice_create(cursor, user, settlement_agent_ids, journal_id, product_id)
+            invoices_agent = agents_pool.action_invoice_create(cursor, user, settlement_agent_ids, journal_id, product_id,mode)
 
             res[settlement.id] = invoices_agent.values()
         return res
@@ -198,7 +198,7 @@ class settlement_agent (osv.osv):
     """Liquidaciones de Agentes"""
 
     _name = 'settlement.agent'
-
+    _rec_name = 'agent_id'
     def _invoice_line_hook(self, cursor, user, move_line, invoice_line_id):
         '''Call after the creation of the invoice line'''
         return
@@ -232,7 +232,7 @@ class settlement_agent (osv.osv):
         return False
 
 
-    def action_invoice_create(self, cursor, user, ids, journal_id, product_id, context=None):
+    def action_invoice_create(self, cursor, user, ids, journal_id, product_id,mode,context=None):
         '''Return ids of created invoices for the settlements'''
 
         invoice_obj = self.pool.get('account.invoice')
@@ -241,12 +241,12 @@ class settlement_agent (osv.osv):
         res = {}
 
         for settlement in self.browse(cursor, user, ids, context=context):
-
+            if (not settlement.total_sections) and (not settlement.total):
+                continue
             payment_term_id = False
             partner = settlement.agent_id and settlement.agent_id.partner_id
             if not partner:
-                raise osv.except_osv(_('Error, partner fail !'),
-                    _('Agent to settle hasn\'t assigned partner.'))
+                continue
 
            #El tipo es de facura de proveedor
             account_id = partner.property_account_payable.id
@@ -299,31 +299,50 @@ class settlement_agent (osv.osv):
                 )
             else:
                 tax_ids = map(lambda x: x.id, taxes)
-            for invoice in settlement.invoices:
-                origin = invoice.invoice_number
-                name = invoice.invoice_number
-                price_unit = invoice.settled_amount
-                discount = 0
 
-                #set UoS if it's a sale and the picking doesn't have one
-                uos_id =  False
-
-                account_id = self.pool.get('account.fiscal.position').map_account(cursor, user, partner.property_account_position, account_id)
+            account_id = self.pool.get('account.fiscal.position').map_account(cursor, user, partner.property_account_position, account_id)
+            uos_id =  False  #set UoS if it's a sale and the picking doesn't have one
+            if mode == 'invoice':
+                for invoice in settlement.invoices:
+                    invoice_line_id = invoice_line_obj.create(cursor, user, {
+                        'name': invoice.invoice_number,
+                        'origin': invoice.invoice_number,
+                        'invoice_id': invoice_id,
+                        'uos_id': uos_id,
+                        'product_id': product.id,
+                        'account_id': account_id,
+                        'price_unit': invoice.settled_amount,
+                        'discount': 0,
+                        'quantity': 1,
+                        'invoice_line_tax_id': [(6, 0, tax_ids)],
+                        }, context=context)            
+            elif mode == 'line':
+                for line in settlement.lines:
+                    invoice_line_id = invoice_line_obj.create(cursor, user, {
+                        'name': line.invoice_id.number,
+                        'origin': line.invoice_id.number,
+                        'invoice_id': invoice_id,
+                        'uos_id': uos_id,
+                        'product_id': product.id,
+                        'account_id': account_id,
+                        'price_unit': line.commission,
+                        'discount': 0,
+                        'quantity': 1,
+                        'invoice_line_tax_id': [(6, 0, tax_ids)],
+                        }, context=context)
+            elif mode == 'agent':
                 invoice_line_id = invoice_line_obj.create(cursor, user, {
-                    'name': name,
-                    'origin': origin,
-                    'invoice_id': invoice_id,
-                    'uos_id': uos_id,
-                    'product_id': product.id,
-                    'account_id': account_id,
-                    'price_unit': price_unit,
-                    'discount': discount,
-                    'quantity': 1,
-                    'invoice_line_tax_id': [(6, 0, tax_ids)],
-                    #'account_analytic_id': account_analytic_id,
-                    }, context=context)
-                self._invoice_line_hook(cursor, user, invoice, invoice_line_id)
-
+                        'name': settlement.settlement_id.name or '',
+                        'origin': settlement.settlement_id.name or '',
+                        'invoice_id': invoice_id,
+                        'uos_id': uos_id,
+                        'product_id': product.id,
+                        'account_id': account_id,
+                        'price_unit': settlement.total,
+                        'discount': 0,
+                        'quantity': 1,
+                        'invoice_line_tax_id': [(6, 0, tax_ids)],
+                        }, context=context)
             invoice_obj.button_compute(cursor, user, [invoice_id], context=context,
                     set_total=(type in ('in_invoice', 'in_refund')))
             self._invoice_hook(cursor, user, settlement, invoice_id)

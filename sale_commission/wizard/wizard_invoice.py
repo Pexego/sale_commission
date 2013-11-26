@@ -30,6 +30,7 @@ class settled_invoice_wizard (osv.osv_memory):
     _columns = {
         'journal_id':fields.many2one('account.journal', 'Target journal', required=True, select=1),
         'product_id':fields.many2one('product.product', 'Product for account', required=True, select=1),
+        'mode': fields.selection([('line', 'for each invoice line settled'),('invoice','for each sale invoice'),('agent','summary for each agent')], 'A line', required=True),
     }
     _defaults = {
     }
@@ -39,13 +40,13 @@ class settled_invoice_wizard (osv.osv_memory):
     def create_invoice(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
-
+        # import ipdb; ipdb.set_trace()
         data_pool = self.pool.get('ir.model.data')
         settlement_obj = self.pool.get('settlement')
 
         for o in self.browse(cr, uid, ids, context=context):
             res = settlement_obj.action_invoice_create(cr, uid, context['active_ids'],
-                journal_id=o.journal_id.id, product_id=o.product_id.id, context=context)
+                journal_id=o.journal_id.id, product_id=o.product_id.id,mode=o.mode,context=context)
 
         invoice_ids = res.values()
 
