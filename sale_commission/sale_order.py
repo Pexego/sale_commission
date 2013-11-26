@@ -88,7 +88,6 @@ class sale_order(osv.osv):
         if ids:
             sale_order_agent.unlink(cr, uid, sale_order_agent.search(cr, uid ,[('sale_id','=',ids)]))
         if res.get('value', False) and part:
-            
             partner = self.pool.get('res.partner').browse(cr, uid, part)
             for partner_agent in partner.commission_ids:
                 vals={
