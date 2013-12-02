@@ -210,21 +210,23 @@ class sale_order_line(osv.osv):
         if ids:
             vals['line_id'] = ids[0]
         return sale_line_agent.create(cr,uid,vals)
-    def product_id_change(self, cr, uid, ids, pricelist, product, qty=0,
+    def product_id_change2(self, cr, uid, ids,pricelist, product, qty=0,
             uom=False, qty_uos=0, uos=False, name='', partner_id=False,
-            lang=False, update_tax=True, date_order=False, packaging=False, fiscal_position=False, flag=False, context=None):
+            lang=False, update_tax=True, date_order=False, packaging=False, fiscal_position=False, flag=False,sale_agent_ids=False,context=None):
         res = super(sale_order_line, self).product_id_change(cr, uid, ids, pricelist, product, qty,uom, qty_uos, uos, name, partner_id,lang, update_tax, date_order,packaging,fiscal_position,flag,context)
         # import ipdb; ipdb.set_trace()
-        if 'order_id' in context and product:
+        if 'product':
             list_agent_ids = []
             product_obj = self.pool.get("product.product").browse(cr,uid,product)
-            order_obj = self.pool.get("sale.order").browse(cr,uid,context['order_id'])
+            # order_obj = self.pool.get("sale.order").browse(cr,uid,context['order_id'])
             sale_line_agent = self.pool.get("sale.line.agent")    
             if ids:
                 sale_line_agent.unlink(cr,uid,sale_line_agent.search(cr,uid,[('line_id','in',ids)]))
                 res['value']['line_agent_ids'] = []
             if not product_obj.commission_exent:
-                order_agent_ids = [x.agent_id.id for x in order_obj.sale_agent_ids]
+                order_comm_ids = [x[1] for x in sale_agent_ids if x[0] != 2]
+                order_agent_ids = [ x.agent_id.id for x in self.pool.get("sale.order.agent").browse(cr,uid,order_comm_ids)]
+                # order_agent_ids = [x.agent_id.id for x in order_obj.sale_agent_ids]
                 dic= {}
                 for prod_record in product_obj.product_agent_ids:
                     if not prod_record.agent_ids: #no hay agentes especificados para la comisión: se usan los agentes del pedido
