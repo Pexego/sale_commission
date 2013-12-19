@@ -215,7 +215,7 @@ class sale_order_line(osv.osv):
             lang=False, update_tax=True, date_order=False, packaging=False, fiscal_position=False, flag=False,sale_agent_ids=False,context=None):
         res = super(sale_order_line, self).product_id_change(cr, uid, ids, pricelist, product, qty,uom, qty_uos, uos, name, partner_id,lang, update_tax, date_order,packaging,fiscal_position,flag,context)
         # import ipdb; ipdb.set_trace()
-        if 'product':
+        if product:
             list_agent_ids = []
             product_obj = self.pool.get("product.product").browse(cr,uid,product)
             # order_obj = self.pool.get("sale.order").browse(cr,uid,context['order_id'])
