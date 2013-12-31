@@ -115,6 +115,16 @@ class sale_order(osv.osv):
                 self.pool.get('stock.picking').write(cr, uid, pickings, {'agent_ids': [[6, 0, agents]] })
         return res
 
+    def create(self, cr, uid, values, context=None):
+        """
+        Para que el cliente gtk no borre el agente al darle a guardar
+        """
+        res = super(sale_order, self).create(cr, uid, values, context=context)
+        if 'sale_agent_ids' in values:
+            for sale_order_agent in values['sale_agent_ids']:
+                self.pool.get('sale.order.agent').write(cr, uid, sale_order_agent[1], {'sale_id':res})
+        return res
+
 sale_order()
 
 class sale_line_agent(osv.osv):
@@ -152,7 +162,6 @@ class sale_line_agent(osv.osv):
                         result['warning']['title'] = _('Fee installments!')
                         result['warning']['message'] = _('A commission has been assigned by sections that does not match that defined for the agent by default, so that these sections shall apply only on this bill.')
         return result
-
 sale_line_agent()
 
 
@@ -169,7 +178,6 @@ class sale_order_line(osv.osv):
             context = {}
         
         res = super(sale_order_line, self).invoice_line_create(cr, uid, ids, context)
-        # import ipdb; ipdb.set_trace()
         for inv_line in self.pool.get('account.invoice.line').browse(cr, uid, res):
             list_ids = [x.id for x in inv_line.commission_ids]
             self.pool.get('invoice.line.agent').calculate_commission(cr,uid,list_ids)
@@ -186,7 +194,6 @@ class sale_order_line(osv.osv):
 
     def _prepare_order_line_invoice_line(self, cr, uid, line, account_id=False, context=None):
         res = super(sale_order_line,self)._prepare_order_line_invoice_line(cr,uid,line,account_id,context)
-        # import ipdb; ipdb.set_trace()
         list_ids = []
         if not line.product_id.commission_exent:
             if not line.line_agent_ids: #si la linea no tiene comissiones arrastro los del pedido a la linea de factura
@@ -214,7 +221,6 @@ class sale_order_line(osv.osv):
             uom=False, qty_uos=0, uos=False, name='', partner_id=False,
             lang=False, update_tax=True, date_order=False, packaging=False, fiscal_position=False, flag=False,sale_agent_ids=False,context=None):
         res = super(sale_order_line, self).product_id_change(cr, uid, ids, pricelist, product, qty,uom, qty_uos, uos, name, partner_id,lang, update_tax, date_order,packaging,fiscal_position,flag,context)
-        # import ipdb; ipdb.set_trace()
         if product:
             list_agent_ids = []
             product_obj = self.pool.get("product.product").browse(cr,uid,product)
@@ -242,6 +248,16 @@ class sale_order_line(osv.osv):
                     line_agent_id = self._create_line_commission(cr,uid,ids,k,dic[k])
                     list_agent_ids.append(int(line_agent_id))
                 res['value']['line_agent_ids'] = list_agent_ids
+        return res
+
+    def create(self, cr, uid, values, context=None):
+        """
+        Para que el cliente gtk no borre el agente de la linea al darle a guardar
+        """
+        res = super(sale_order_line, self).create(cr, uid, values, context=context)
+        if 'line_agent_ids' in values:
+            for sale_line_agent in values['line_agent_ids']:
+                self.pool.get('sale.line.agent').write(cr, uid, sale_line_agent[1], {'line_id':res})
         return res
 
 sale_order_line()
