@@ -60,7 +60,7 @@ class commission_section(osv.osv):
         'commission_from': fields.float('From'),
         'commission_until': fields.float('Until'),
         'percent': fields.float('Percent'),
-        'commission_id': fields.many2one('commission', 'Commission')
+        'commission_id': fields.many2one('commission', 'Commission', required=True)
 
     }
 

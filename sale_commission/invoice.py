@@ -35,7 +35,7 @@ class invoice_line_agent(osv.osv):
         'invoice_id':fields.related('invoice_line_id', 'invoice_id', type='many2one', relation='account.invoice', string='Invoice'),
         'invoice_date':fields.related('invoice_id',type='date_invoice', readonly=True),
         'agent_id': fields.many2one('sale.agent', 'Agent', required=True, ondelete='cascade', help=''),
-        'commission_id':fields.many2one('commission', 'Applied commission', required=True, ondelete='cascade', help=''),
+        'commission_id':fields.many2one('commission', 'Applied commission', required=True, help=''),
         'settled':fields.boolean('Settled', readonly=True),
         'quantity':fields.float('Settled amount')
     }

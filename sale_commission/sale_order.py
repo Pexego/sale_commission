@@ -40,7 +40,7 @@ class sale_order_agent(osv.osv):
     _columns = {
         'sale_id':fields.many2one('sale.order', 'Sale order', required=False, ondelete='cascade', help=''),
         'agent_id':fields.many2one('sale.agent', 'Agent', required=True, ondelete='cascade', help=''),
-        'commission_id':fields.many2one('commission', 'Applied commission', required=True, ondelete='cascade', help=''),
+        'commission_id':fields.many2one('commission', 'Applied commission', required=True, help=''),
     }
 
     def onchange_agent_id(self, cr, uid, ids, agent_id):
@@ -134,7 +134,7 @@ class sale_line_agent(osv.osv):
     _columns = {
         'line_id':fields.many2one('sale.order.line', 'Sale order line', required=False, ondelete='cascade', help=''),
         'agent_id':fields.many2one('sale.agent', 'Agent', required=True, ondelete='cascade', help=''),
-        'commission_id':fields.many2one('commission', 'Applied commission', required=True, ondelete='cascade', help=''),
+        'commission_id':fields.many2one('commission', 'Applied commission', required=True, help=''),
     }
 
     def onchange_agent_id(self, cr, uid, ids, agent_id):

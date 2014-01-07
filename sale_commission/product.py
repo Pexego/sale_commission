@@ -29,7 +29,7 @@ class product_agent_commission(osv.osv):
 
     _columns = {
         'product_id':fields.many2one('product.product', 'Product', required=False, ondelete='cascade', help=''),
-        'commission_id':fields.many2one('commission', 'Applied commission', required=True, ondelete='cascade', help=''),
+        'commission_id':fields.many2one('commission', 'Applied commission', required=True, help=''),
         'agent_ids':fields.many2many('sale.agent', 'product_agent_sale_agent_rel', 'product_commission_id','agent_id','Agents'),
     }
 
