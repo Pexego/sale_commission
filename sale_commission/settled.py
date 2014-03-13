@@ -94,14 +94,13 @@ class recalculate_commision_wizard (osv.osv_memory):
               'INNER JOIN invoice_line_agent ON invoice_line_agent.invoice_line_id=account_invoice_line.id ' \
               'INNER JOIN account_invoice ON account_invoice_line.invoice_id = account_invoice.id ' \
               'WHERE invoice_line_agent.agent_id in (' + ",".join(map(str, context['active_ids'])) + ') AND invoice_line_agent.settled=False ' \
-              'AND account_invoice.state<>\'draft\' AND account_invoice.type=\'out_invoice\''\
+              'AND account_invoice.state not in (\'draft\',\'cancel\') AND account_invoice.type in (\'out_invoice\',\'out_refund\')'\
               'AND account_invoice.date_invoice >= \'' + o.date_from + '\' AND account_invoice.date_invoice <= \'' + o.date_to +'\''\
               ' AND account_invoice.company_id = ' + str(user.company_id.id)
 
             cr.execute(sql)
             res = cr.fetchall()
             inv_line_agent_ids = [x[0] for x in res]
-
             self.pool.get ('invoice.line.agent').calculate_commission( cr, uid, inv_line_agent_ids)
 
 
@@ -357,7 +356,7 @@ class settlement_agent (osv.osv):
               'INNER JOIN invoice_line_agent ON invoice_line_agent.invoice_line_id=account_invoice_line.id ' \
               'INNER JOIN account_invoice ON account_invoice_line.invoice_id = account_invoice.id ' \
               'WHERE invoice_line_agent.agent_id=' + str(set_agent.agent_id.id) + ' AND invoice_line_agent.settled=True ' \
-              'AND account_invoice.state<>\'draft\' AND account_invoice.type=\'out_invoice\''\
+              'AND account_invoice.state not in (\'draft\',\'cancel\') AND account_invoice.type=\'out_invoice\''\
               'AND account_invoice.date_invoice >= \'' + date_from + '\' AND account_invoice.date_invoice <= \'' + date_to +'\''\
               ' AND account_invoice.company_id = ' + str(user.company_id.id)
 
@@ -371,13 +370,14 @@ class settlement_agent (osv.osv):
               'INNER JOIN invoice_line_agent ON invoice_line_agent.invoice_line_id=account_invoice_line.id ' \
               'INNER JOIN account_invoice ON account_invoice_line.invoice_id = account_invoice.id ' \
               'WHERE invoice_line_agent.agent_id=' + str(set_agent.agent_id.id) + ' AND invoice_line_agent.settled=False ' \
-              'AND account_invoice.state<>\'draft\' AND account_invoice.type=\'out_invoice\''\
+              'AND account_invoice.state not in (\'draft\',\'cancel\') AND account_invoice.type in (\'out_invoice\',\'out_refund\')'\
               'AND account_invoice.date_invoice >= \'' + date_from + '\' AND account_invoice.date_invoice <= \'' + date_to +'\''\
               ' AND account_invoice.company_id = ' + str(user.company_id.id)
        
         cr.execute(sql)
         res = cr.fetchall()
         inv_line_ids = [x[0] for x in res]
+
         total_per = 0
         total_sections = 0
         total = 0
@@ -399,14 +399,17 @@ class settlement_agent (osv.osv):
             if line.commission_id.type == "tramos":
                 if line.invoice_line_id.product_id.commission_exent != True:
                     # Hacemos un agregado de la base de cálculo agrupándolo por las distintas comisiones en tramos que tenga el agente asignadas
+                    if line.invoice_line_id.invoice_id.type == 'out_refund':
+                        sign_price = - line.invoice_line_id.price_subtotal
+                    else:
+                        sign_price = line.invoice_line_id.price_subtotal
+
                     if  line.commission_id.id in sections:
-                        sections[line.commission_id.id]['base'] = sections[line.commission_id.id]['base'] + line.invoice_line_id.price_subtotal
+                        sections[line.commission_id.id]['base'] = sections[line.commission_id.id]['base'] + sign_price
                         sections[line.commission_id.id]['lines'].append(line)                   # Añade la línea de la que se añade esta base para el cálculo por tramos
                     else:
-                        sections[line.commission_id.id] = {'type': line.commission_id, 'base':line.invoice_line_id.price_subtotal, 'lines':[line]}
-
+                        sections[line.commission_id.id] = {'type': line.commission_id, 'base':sign_price, 'lines':[line]}
         #Tramos para cada tipo de comisión creados 
-
         for tramo in sections:
             #Cálculo de la comisión  para cada tramo
             sections[tramo].update({'commission': sections[tramo]['type'].calcula_tramos(sections[tramo]['base'])})
@@ -414,7 +417,7 @@ class settlement_agent (osv.osv):
             # reparto de la comisión para cada linea
             
             for linea_tramo in  sections[tramo]['lines']:
-                com_por_linea = sections[tramo]['commission']* (linea_tramo.invoice_line_id.price_subtotal/sections[tramo]['base'])
+                com_por_linea = sections[tramo]['commission']* (linea_tramo.invoice_line_id.price_subtotal/(abs(sections[tramo]['base']) or 1.0))
                 linea_tramo.write({'commission':com_por_linea})
                 inv_ag_ids = self.pool.get('invoice.line.agent').search(cr, uid, [('invoice_line_id', '=', linea_tramo.invoice_line_id.id), ('agent_id', '=', set_agent.agent_id.id)])
                 self.pool.get('invoice.line.agent').write(cr, uid, inv_ag_ids, {'settled': True, 'quantity': com_por_linea})
@@ -457,7 +460,11 @@ class settlement_line (osv.osv):
                 invoice_line_amount = line.invoice_line_id.price_subtotal
                 if commission_app.type=="fijo":
                     commission_per = commission_app.fix_qty
-                    amount = amount + line.invoice_line_id.price_subtotal * float(commission_per) / 100
+                    # Para tener en cuenta las rectificativas
+                    if line.invoice_line_id.invoice_id.type == 'out_refund':
+                        amount = amount - line.invoice_line_id.price_subtotal * float(commission_per) / 100
+                    else:
+                        amount = amount + line.invoice_line_id.price_subtotal * float(commission_per) / 100
 
                 elif commission_app.type=="tramos":
                     invoice_line_amount = 0
