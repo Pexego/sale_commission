@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <!--TREE VIEW OF PRODUCTS-STRUCT COSTS AUXILIARY OSV MEMORY OBJECT-->
+        <record id="product_percent_struct_costs_view" model="ir.ui.view">
+            <field name="name">product.percent.struct.costs.view</field>
+            <field name="model">product.percent.struct.costs</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Products Structural Costs Impact" editable="top">
+                    <field name="product_id" on_change="onchange_product_id(parent.prev_fyear_id, parent.prev_period_id, product_id)"/>
+                    <field name="total_sales" on_change ="onchange_total_sales(total_sales)"/>
+                    <field name="forecasted_sales"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--FORM VIEW OF PRODUCTS-STRUCT COSTS AUXILIARY OSV MEMORY OBJECT-->
+        <record id="product_percent_struct_costs_form_view" model="ir.ui.view">
+            <field name="name">product.percent.struct.costs.form.view</field>
+            <field name="model">product.percent.struct.costs</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Product Structural Costs Impact">
+                    <group colspan="4">
+                        <field name="product_id" on_change="onchange_product_id(parent.prev_fyear_id, parent.prev_period_id, product_id)"/>
+                        <field name="total_sales" on_change ="onchange_total_sales(total_sales)"/>
+                        <field name="forecasted_sales"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_product_percent_struct_costs_tree" model="ir.actions.act_window">
+            <field name="name">Products Structural Costs Impact</field>
+            <field name="res_model">product.percent.struct.costs</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="product_percent_struct_costs_form_view"/>
+        </record>
+
+    </data>
+</openerp>

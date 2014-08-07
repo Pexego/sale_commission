@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_mrp_production_manpower_mrp_user","mrp.production.manpower","model_mrp_production_manpower","mrp.group_mrp_user",1,0,0,0
+"access_mrp_production_manpower_mrp_manager","mrp.production.manpower","model_mrp_production_manpower","mrp.group_mrp_manager",1,1,1,1
+"access_mrp_production_fixed_costs_mrp_user","mrp.production.fixed.costs","model_mrp_production_fixed_costs","mrp.group_mrp_user",1,0,0,0
+"access_mrp_production_fixed_costs_mrp_manager","mrp.production.fixed.costs","model_mrp_production_fixed_costs","mrp.group_mrp_manager",1,1,1,1

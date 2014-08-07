@@ -1,0 +1,479 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+#	* production_costs
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 6.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-02-27 13:26+0000\n"
+"PO-Revision-Date: 2012-02-27 16:51+0100\n"
+"Last-Translator: Marta <marta@pexego.es>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+
+#. module: production_costs
+#: constraint:stock.move:0
+msgid "Cannot move a blocked production lot to internal or customer location"
+msgstr "No se puede mover un lote bloqueado a una ubicación interna o de cliente"
+
+#. module: production_costs
+#: model:ir.actions.act_window,name:production_costs.action_products_struct_costs_impact_launch_wizard
+#: model:ir.ui.menu,name:production_costs.action_products_struct_costs_impact
+msgid "Calculate Structural Costs Impact"
+msgstr "Calc. impacto costes estructurales"
+
+#. module: production_costs
+#: field:mrp.production.unit.costs,unit_fixed_cost:0
+msgid "Unit fixed cost"
+msgstr "Coste fijo unitario"
+
+#. module: production_costs
+#: field:mrp.production,products_total_cost:0
+msgid "Material total cost"
+msgstr "Coste total de material"
+
+#. module: production_costs
+#: constraint:stock.move:0
+msgid "Location not valid for this product"
+msgstr "Ubicación no válida para este producto"
+
+#. module: production_costs
+#: constraint:stock.move:0
+msgid "You can not move products from or to a location of the type view."
+msgstr "No se pueden mover productos desde o hacia una ubicación de tipo vista."
+
+#. module: production_costs
+#: field:mrp.production.fixed.costs,company_id:0
+#: field:mrp.production.manpower,company_id:0
+#: field:structural.costs.impact.wizard,company_id:0
+msgid "Company"
+msgstr "Compañía"
+
+#. module: production_costs
+#: field:product.percent.struct.costs,forecasted_sales:0
+msgid "Forecasted Sold Units"
+msgstr "Previsión de Unidades Vendidas"
+
+#. module: production_costs
+#: help:mrp.production.unit.costs,new_standard_price:0
+msgid "New product price (only if its cost method is set to average)"
+msgstr "Nuevo precio producto (sólo si el método de coste es precio medio)"
+
+#. module: production_costs
+#: code:addons/production_costs/wizard/structural_costs_impact_wizard.py:119
+#, python-format
+msgid "Are fiscal years already defined...?"
+msgstr "Están los años fiscales definidos...?"
+
+#. module: production_costs
+#: code:addons/production_costs/wizard/structural_costs_impact_wizard.py:119
+#, python-format
+msgid "Error!"
+msgstr "Error!"
+
+#. module: production_costs
+#: field:mrp.production.fixed.costs,amount:0
+msgid "Amount"
+msgstr "Cantidad"
+
+#. module: production_costs
+#: model:ir.actions.act_window,name:production_costs.action_product_percent_struct_costs_tree
+#: view:product.percent.struct.costs:0
+msgid "Products Structural Costs Impact"
+msgstr "Products Structural Costs Impact"
+
+#. module: production_costs
+#: model:ir.model,name:production_costs.model_structural_costs_impact_wizard
+msgid "Structural costs impact Wizard"
+msgstr "Structural costs impact Wizard"
+
+#. module: production_costs
+#: field:mrp.production.manpower,production_id:0
+msgid "Related production order"
+msgstr "Órden de producción relacionada"
+
+#. module: production_costs
+#: model:ir.model,name:production_costs.model_stock_move
+msgid "Stock Move"
+msgstr "Movimiento stock"
+
+#. module: production_costs
+#: model:ir.model,name:production_costs.model_product_percent_struct_costs
+msgid "Structural products cost"
+msgstr "Cost. estructural productos"
+
+#. module: production_costs
+#: view:mrp.production:0
+msgid "Unit Costs by Product"
+msgstr "Coste uni. por producto"
+
+#. module: production_costs
+#: view:structural.costs.impact.wizard:0
+msgid "This wizard will impact percentually over selected products the structural cost of chosen fiscal year..."
+msgstr "Este asistente repercutirá porcentualmente sobre los siguientes productos el coste estructural del año (y periodo) elegido..."
+
+#. module: production_costs
+#: code:addons/production_costs/mrp_production.py:98
+#: code:addons/production_costs/mrp_production.py:169
+#: code:addons/production_costs/mrp_production.py:172
+#: code:addons/production_costs/production_manpower.py:48
+#, python-format
+msgid "Warning!"
+msgstr "Aviso!"
+
+#. module: production_costs
+#: field:structural.costs.impact.wizard,cost_to_impact:0
+msgid "Cost over products"
+msgstr "Coste sobre productos"
+
+#. module: production_costs
+#: model:ir.model,name:production_costs.model_stock_production_lot
+msgid "Production lot"
+msgstr "Lote de producción"
+
+#. module: production_costs
+#: view:mrp.production:0
+msgid "Manpower/Duration"
+msgstr "Mano de Obra/Duración"
+
+#. module: production_costs
+#: field:mrp.production.unit.costs,unit_production_cost:0
+msgid "Unit production cost"
+msgstr "Coste uni. producción"
+
+#. module: production_costs
+#: field:mrp.production.manpower,employee_id:0
+msgid "Employee"
+msgstr "Empleado"
+
+#. module: production_costs
+#: sql_constraint:stock.production.lot:0
+msgid "The combination of serial number and internal reference must be unique !"
+msgstr "¡La combinación de número de serie y referencia interna debe ser única!"
+
+#. module: production_costs
+#: field:mrp.production.manpower,start_date:0
+msgid "Start date"
+msgstr "Fecha de comienzo"
+
+#. module: production_costs
+#: field:mrp.production,production_manpower:0
+msgid "Production manpower"
+msgstr "Mano de obra de producción"
+
+#. module: production_costs
+#: constraint:stock.move:0
+msgid "Cannot move an expired production lot to internal or customer location"
+msgstr "No puede mover un lote caducado a una ubicación interna o de cliente."
+
+#. module: production_costs
+#: view:mrp.production:0
+msgid "Production Costs"
+msgstr "Costes de Producción"
+
+#. module: production_costs
+#: field:structural.costs.impact.wizard,struct_analytic_acc_id:0
+msgid "Structural Expenses Analytic Account"
+msgstr "Cuenta Analítica de Gastos Estructurales"
+
+#. module: production_costs
+#: field:mrp.production,total_production_cost:0
+msgid "Total production cost"
+msgstr "Coste total de producción"
+
+#. module: production_costs
+#: constraint:mrp.production:0
+msgid "Order quantity cannot be negative or zero!"
+msgstr "¡La cantidad de la orden no puede ser negativa o cero!"
+
+#. module: production_costs
+#: selection:structural.costs.impact.wizard,structural_cost_method:0
+msgid "Please, select a method for impacting costs..."
+msgstr "Por favor, elija un método para repercutir el coste..."
+
+#. module: production_costs
+#: view:mrp.production.manpower:0
+msgid "Production Manpower"
+msgstr "Mano de obra de la producción"
+
+#. module: production_costs
+#: model:ir.model,name:production_costs.model_mrp_production_unit_costs
+msgid "Production unit Costs"
+msgstr "Production unit Costs"
+
+#. module: production_costs
+#: code:addons/production_costs/mrp_production.py:172
+#, python-format
+msgid "This worker does not have associated an \"hour\" product. Please, set it before continuing..."
+msgstr "Este trabajador no tiene asociado un producto  \"hour\". Por favor, configurar antes de continuar..."
+
+#. module: production_costs
+#: help:structural.costs.impact.wizard,structural_cost_method:0
+msgid "Uniform method: all costs are distributed equally amongst products."
+msgstr "Método uniforme: el coste se distribuye uniformemente por los productos."
+
+#. module: production_costs
+#: model:ir.actions.act_window,name:production_costs.action_view_mrp_production_fixed_costs
+#: view:mrp.production.fixed.costs:0
+msgid "Production Fixed Costs"
+msgstr "Costes Fijos de producción"
+
+#. module: production_costs
+#: help:structural.costs.impact.wizard,cost_to_impact:0
+msgid "Cost based on forecasted sales."
+msgstr "Coste basado en ventas previstas."
+
+#. module: production_costs
+#: field:mrp.production,end_production_date:0
+msgid "End production date"
+msgstr "Fecha fin de producción"
+
+#. module: production_costs
+#: model:ir.model,name:production_costs.model_mrp_production_manpower
+msgid "Production manpower involved"
+msgstr "Mano de obra involucrada en la producción"
+
+#. module: production_costs
+#: model:ir.actions.act_window,name:production_costs.action_view_mrp_production_manpower
+msgid "Production Manpower List"
+msgstr "Lista de mano de obra de producciones"
+
+#. module: production_costs
+#: model:ir.model,name:production_costs.model_mrp_production_fixed_costs
+msgid "mrp.production.fixed.costs"
+msgstr "mrp.production.fixed.costs"
+
+#. module: production_costs
+#: model:ir.model,name:production_costs.model_mrp_production
+msgid "Manufacturing Order"
+msgstr "Órden de producción"
+
+#. module: production_costs
+#: field:structural.costs.impact.wizard,structural_cost:0
+msgid "Structural Costs"
+msgstr "Costes estructurales"
+
+#. module: production_costs
+#: field:structural.costs.impact.wizard,structural_cost_method:0
+msgid "Cost Method"
+msgstr "Método de coste"
+
+#. module: production_costs
+#: constraint:stock.move:0
+msgid "You try to assign a lot which is not from the same product"
+msgstr "Está intentando asignar un lote que no es del mismo producto"
+
+#. module: production_costs
+#: field:mrp.production,unit_costs:0
+msgid "Unit costs by product"
+msgstr "Costes uni. por producto"
+
+#. module: production_costs
+#: model:ir.model,name:production_costs.model_mrp_product_produce
+msgid "Product Produce"
+msgstr "Producir producto"
+
+#. module: production_costs
+#: view:product.percent.struct.costs:0
+msgid "Product Structural Costs Impact"
+msgstr "Repercusión de costes estructurales sobre productos"
+
+#. module: production_costs
+#: code:addons/production_costs/mrp_production.py:169
+#, python-format
+msgid "There are no assigned workers to this production. Please, specify some before continuing..."
+msgstr "No hay trabajadores asignados a esta producción. Por favor, añada algunos antes de continuar..."
+
+#. module: production_costs
+#: code:addons/production_costs/mrp_production.py:98
+#, python-format
+msgid "Must assign first production lot in principal final move with product: %s"
+msgstr "Must assign first production lot in principal final move with product: %s"
+
+#. module: production_costs
+#: field:mrp.production,manpower_cost:0
+msgid "Manpower total cost"
+msgstr "Coste total mano de obra"
+
+#. module: production_costs
+#: sql_constraint:mrp.production:0
+msgid "Reference must be unique per Company!"
+msgstr "Referencia debe ser única por compañía!"
+
+#. module: production_costs
+#: field:mrp.production,total_fixed_cost:0
+msgid "Total fixed cost"
+msgstr "Total de costes fijos"
+
+#. module: production_costs
+#: view:mrp.production:0
+msgid "Compute Cost Price"
+msgstr "Calcular precio coste"
+
+#. module: production_costs
+#: field:mrp.production.manpower,end_date:0
+msgid "End date"
+msgstr "Fecha fin"
+
+#. module: production_costs
+#: field:mrp.production.unit.costs,new_standard_price:0
+msgid "New standard product price"
+msgstr "Nuevo precio producto."
+
+#. module: production_costs
+#: code:addons/production_costs/wizard/structural_costs_impact_wizard.py:145
+#, python-format
+msgid "Impacted Products"
+msgstr "Productos afectados"
+
+#. module: production_costs
+#: field:mrp.production.unit.costs,unit_product_cost:0
+msgid "Material unit cost"
+msgstr "Coste uni. material"
+
+#. module: production_costs
+#: field:structural.costs.impact.wizard,prev_period_id:0
+msgid "Period"
+msgstr "Periodo"
+
+#. module: production_costs
+#: view:structural.costs.impact.wizard:0
+msgid "Please, enter data:"
+msgstr "Por favor, indique lo siguiente:"
+
+#. module: production_costs
+#: view:structural.costs.impact.wizard:0
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: production_costs
+#: field:product.product,structural_cost:0
+msgid "Structural cost"
+msgstr "Coste estructural"
+
+#. module: production_costs
+#: field:product.percent.struct.costs,wizard_id:0
+msgid "Wizard"
+msgstr "Asistente"
+
+#. module: production_costs
+#: constraint:stock.move:0
+msgid "You must assign a production lot for this product"
+msgstr "Debe asignar un lote de producción para este producto"
+
+#. module: production_costs
+#: selection:structural.costs.impact.wizard,structural_cost_method:0
+msgid "Uniform"
+msgstr "Uniforme"
+
+#. module: production_costs
+#: field:mrp.production.fixed.costs,production_id:0
+#: field:mrp.production.unit.costs,production_id:0
+msgid "Production"
+msgstr "Producción"
+
+#. module: production_costs
+#: field:mrp.production,begin_production_date:0
+msgid "Begin production date"
+msgstr "Fecha de comienzo de producción"
+
+#. module: production_costs
+#: code:addons/production_costs/production_manpower.py:48
+#, python-format
+msgid "There is no product defined for this employee. Please, define one before continuing..."
+msgstr "No se ha asociado ningún producto a este empleado. Por favor, defina uno antes de continuar..."
+
+#. module: production_costs
+#: field:structural.costs.impact.wizard,prev_fyear_id:0
+msgid "Fiscal Year to Look"
+msgstr "Año fiscal a buscar"
+
+#. module: production_costs
+#: field:mrp.production.fixed.costs,name:0
+msgid "Description"
+msgstr "Descripción"
+
+#. module: production_costs
+#: view:mrp.production:0
+msgid "Manpower Specification"
+msgstr "Mano de obra"
+
+#. module: production_costs
+#: view:mrp.production:0
+msgid "Total Costs"
+msgstr "Coste Total"
+
+#. module: production_costs
+#: view:structural.costs.impact.wizard:0
+msgid "Impact costs"
+msgstr "Costes de la repercusión"
+
+#. module: production_costs
+#: view:structural.costs.impact.wizard:0
+msgid "Impact Structural Costs on Products Wizard"
+msgstr "Asistente de Repercusión de Costes Estructurales sobre Productos"
+
+#. module: production_costs
+#: field:product.percent.struct.costs,total_sales:0
+msgid "Sold Units"
+msgstr "Unidades Vendidas"
+
+#. module: production_costs
+#: field:product.product,manpower_cost:0
+msgid "Manpower cost"
+msgstr "Costes de mano de obra"
+
+#. module: production_costs
+#: view:mrp.production:0
+#: view:mrp.production.fixed.costs:0
+msgid "Fixed Costs"
+msgstr "Costes Fijos"
+
+#. module: production_costs
+#: view:mrp.production.unit.costs:0
+msgid "Production costs by product"
+msgstr "Costes prod. por producto"
+
+#. module: production_costs
+#: model:ir.model,name:production_costs.model_product_product
+#: field:mrp.production.unit.costs,product_id:0
+#: field:product.percent.struct.costs,product_id:0
+msgid "Product"
+msgstr "Producto"
+
+#. module: production_costs
+#: field:mrp.production,fixed_costs:0
+msgid "Production fixed costs"
+msgstr "Costes fijos producción"
+
+#. module: production_costs
+#: field:mrp.production.unit.costs,manpower_unit_cost:0
+msgid "Manpower unit cost"
+msgstr "Coste uni. mano de obra"
+
+#. module: production_costs
+#: view:product.product:0
+msgid "Cost Price:"
+msgstr "Precio de coste:"
+
+#. module: production_costs
+#: constraint:product.product:0
+msgid "Error: Invalid ean code"
+msgstr "Error: Código EAN erróneo"
+
+#. module: production_costs
+#: field:structural.costs.impact.wizard,products_percent:0
+msgid "Sold Products during chosen fiscal year and/or period"
+msgstr "Productos vendidos durante el año fiscal y/o periodo seleccionado"
+
+#. module: production_costs
+#: view:mrp.production:0
+#: field:mrp.production,production_duration:0
+#: field:mrp.production.manpower,production_duration:0
+msgid "Duration"
+msgstr "Duración"
+

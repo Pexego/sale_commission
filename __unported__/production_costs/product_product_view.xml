@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!--AÑADIMOS LOS COSTES ESTRUCTURALES Y DE MANO DE OBRA A LA VISTA FORMULARIO DE PRODUCTOS-->
+        <record id="view_add_costs_product_view_form" model="ir.ui.view">
+            <field name="name">view.add.costs.product.view.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="stock.view_product_standard_price_form"/>
+            <field name="type">form</field>
+                <field name="arch" type="xml">
+                    <field name="list_price" position="after">
+                        <group colspan="2" col="4">
+                            <field name="manpower_cost"/>
+                            <field name="other_prod_cost"/>
+                             <field name="product_cost"/>
+                            <field name="structural_cost"/>
+                            <newline/>
+                        </group>
+                    </field>
+                </field>
+        </record>
+
+       <!--AÑADIMOS LOS COSTES ESTRUCTURALES Y DE MANO DE OBRA A LA VISTA FORMULARIO DE PRODUCTOS-->
+        <record id="view_add_costs_product_view_list" model="ir.ui.view">
+            <field name="name">view.add.costs.product.view.list</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="type">tree</field>
+                <field name="arch" type="xml">
+                    <field name="standard_price" position="before">
+                        <field name="manpower_cost"/>
+                        <field name="structural_cost"/>
+                    </field>
+                </field>
+        </record>
+
+    </data>
+</openerp>

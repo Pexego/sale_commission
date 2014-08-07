@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+    	<record id="product_normal_form_view" model="ir.ui.view">
+      	    <field name="name">product.normal.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <field name="type" position="before">
+                    <field name="miscible"/>
+                    <field name="not_do_procurement"/>
+                </field>
+            </field>
+    	</record>
+	
+	<record id="view_template_property_form" model="ir.ui.view">
+            <field name="name">product.template.stock.property.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="stock.view_template_property_form"/>
+            <field name="arch" type="xml">
+            <field name="property_stock_inventory" position="after">
+                <field name="property_raw"/>
+            </field>
+            </field>
+        </record>
+	
+	<record id="view_normal_property_form" model="ir.ui.view">
+            <field name="name">product.normal.stock.property.form.inherit</field>
+            <field name="model">product.product</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="stock.view_normal_property_form"/>
+            <field name="arch" type="xml">
+            <field name="property_stock_inventory" position="after">
+                <field name="property_raw"/>
+            </field>
+            </field>
+        </record>
+
+        <record id="product_normal_form_view_add_track_all" model="ir.ui.view">
+      	    <field name="name">product.normal.form.add_track_all</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="stock.view_normal_stock_property_form"/>
+            <field name="arch" type="xml">
+                <field name="track_production" position="before">
+                    <field name="track_all"/>
+                </field>
+            </field>
+    	</record>
+
+    </data>
+</openerp>

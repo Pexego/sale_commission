@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Sequences for fields created from the product.
+-->
+<openerp>
+    <data noupdate="1">
+
+        <!-- Type -->
+        <record model="ir.sequence.type" id="seq_type_product_fields">
+            <field name="name">Sequence product fields</field>
+            <field name="code">product.fields</field>
+        </record>
+
+        <!-- Sequence -->
+        <record id="seq_product_fields_action" model="ir.sequence">
+            <field name="name">Def. product fields seq.</field>
+            <field name="code">product.fields</field>
+            <field name="number_next">1</field>
+        </record>
+
+    </data>
+</openerp>

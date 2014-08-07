@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data noupdate="1">
+
+        <record model="ir.sequence.type" id="seq_bom_line_code">
+            <field name="name">Bom sequence</field>
+            <field name="code">mrp.bom.seq</field>
+        </record>
+
+        <record id="seq_default_mrp_bom" model="ir.sequence">
+            <field name="name">Default bom seq.</field>
+            <field name="code">mrp.bom.seq</field>
+        </record>
+
+    </data>
+</openerp>

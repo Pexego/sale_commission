@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <record id="view_production_lot_form_add_simplified_btn" model="ir.ui.view">
+            <field name="name">stock.production.lot.form.add_simplified_btn</field>
+            <field name="model">stock.production.lot</field>
+            <field name="inherit_id" ref="stock.view_production_lot_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/group[2]/button[@string='Downstream Traceability']" position="after">
+                    <button name="action_simplified_traceability" string="Upstream Simplified Traceability" type="object" context="{'type': '', 'field': 'prodlot_id'}" icon="gtk-go-up" colspan="2"/>
+                    <button name="action_simplified_traceability" string="Downstream Simplified Traceability" type="object" context="{'type': 'move_history_simplified_down', 'field': 'prodlot_id'}" icon="gtk-go-down" colspan="2"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>

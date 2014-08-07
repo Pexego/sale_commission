@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openerp>
+    <data>
+        <record id="product_normal_form_view_add_page" model="ir.ui.view">
+            <field name="name">product.normal.form.add_page</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="type">form</field>
+            <field eval="7" name="priority"/>
+            <field name="arch" type="xml">
+                <page string="Descriptions" position="after">
+                    <page string="Fields add to production lots">
+                        <field colspan="4" name="product_fields_ids" nolabel="1"/>
+                    </page>
+                </page>
+            </field>
+        </record>
+
+
+        <record id="product_fields_tree_view" model="ir.ui.view">
+            <field name="name">product.fields.tree</field>
+            <field name="model">product.fields</field>
+            <field name="type">tree</field>
+            <field eval="7" name="priority"/>
+            <field name="arch" type="xml">
+                <tree string="Fields for production lots">
+                   <field name="sequence"/>
+                   <field name="name"/>
+                   <field name="field_description"/>
+                </tree>
+            </field>
+        </record>
+        <record id="product_fields_form_view" model="ir.ui.view">
+            <field name="name">product.fields.form</field>
+            <field name="model">product.fields</field>
+            <field name="type">form</field>
+            <field eval="7" name="priority"/>
+            <field name="arch" type="xml">
+                <form string="Fields for production lots">
+                   <field name="name"/>
+                   <field name="field_description"/>
+                   <field name="sequence"/>
+                   <field name="required"/>
+                   <field name="translate"/>
+                 </form>
+            </field>
+        </record>
+
+
+    </data>
+</openerp>

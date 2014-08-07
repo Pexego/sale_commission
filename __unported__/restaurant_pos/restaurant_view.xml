@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>        
+        <record id="view_pos_pos_form_restaurant" model="ir.ui.view">
+            <field name="name">pos.order_versions</field>
+            <field name="model">pos.order</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+            <field name="arch" type="xml">
+                <page string="Extra Info" position="after">
+                    <page string="Area">
+                        <field name="zone_id"/>
+                        <field name="place_id"/>
+                    </page>
+                </page>
+            </field>
+        </record>
+        
+        <!-- categoria -->
+        <record id="pos_restaurant_category_place_form_view" model="ir.ui.view">
+            <field name="name">pos.category_place.form</field>
+            <field name="model">pos.category_place</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="PoS Area">
+                    <group colspan="2" col="6">
+                        <field name="sequence"/>
+                        <field name="name"/>
+                        <field name="imagen" widget="image" nolabel="1" />
+                    </group>
+                    <newline/>
+                    <group colspan="3" col="6">
+                        <field name="printer" />
+                        <field name="ticket" />
+                    </group>
+                    <newline/>
+                    <group colspan="3" col="6">
+                        <field name="sale_journal_id" domain="[('type','=','sale')]"/>
+                        <field name="sale_simple_journal_id" domain="[('type','=','sale')]"/>
+                    </group>
+                    <newline/>
+                    <newline/>
+                    <field name="journal_ids" />
+                </form>
+            </field>
+        </record>
+        <record id="pos_restaurant_place_tree_view" model="ir.ui.view">
+            <field name="name">pos.category_place.tree</field>
+            <field name="model">pos.category_place</field>
+            <field name="type">tree</field>
+            <field name="field_parent" eval="False"/>
+            <field name="arch" type="xml">
+                <tree string="PoS Areas">
+                    <field name="sequence"/>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+         <!-- Restaurant -->
+        <record id="pos_restaurant_place_form_view" model="ir.ui.view">
+            <field name="name">pos.place.form</field>
+            <field name="model">pos.place</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="PoS Restaurant Place">
+                    <group colspan="3" col="6">
+                        <field name="name"/>
+                        <field name="category" />
+                    </group>
+                    <newline/>
+                    <field name="imagen" widget="image" nolabel="1" />
+                </form>
+            </field>
+        </record>
+        <record id="pos_restaurant_place_tree_view" model="ir.ui.view">
+            <field name="name">pos.place.tree</field>
+            <field name="model">pos.place</field>
+            <field name="type">tree</field>
+            <field name="field_parent" eval="False"/>
+            <field name="arch" type="xml">
+                <tree string="PoS Restaurant Place">
+                    <field name="name"/>
+                    <field name="category" />
+                </tree>
+            </field>
+        </record>
+        
+        <record id="product_normal_form_pos_view" model="ir.ui.view">
+            <field name="name">product.normal.pos.form.inherit</field>
+            <field name="model">product.product</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="point_of_sale.product_normal_form_pos_view"/>
+            <field name="arch" type="xml">
+                  <field name="pos_categ_id" position="after">
+                    <field name="category"/>
+                  </field>
+            </field>
+        </record>
+        
+        <record id="res_users_form_pos_view" model="ir.ui.view">
+            <field name="name">res.users.form.pos.inherit</field>
+            <field name="model">res.users</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <page string="User" position="after">
+                    <page string="POS user">
+                        <field name="pos_code" />
+                    </page>
+                </page>
+            </field>
+        </record>
+        
+        <record id="pos_restaurant_place_action" model="ir.actions.act_window">
+            <field name="name">Add Tables/Rooms</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">pos.place</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem action="pos_restaurant_place_action" 
+        id="menu_pos_restaurant_place" 
+        parent="point_of_sale.menu_point_config_product" sequence="40" />
+        
+        <record id="pos_restaurant_category_place_action" model="ir.actions.act_window">
+            <field name="name">Add POS areas</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">pos.category_place</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem action="pos_restaurant_category_place_action" 
+        id="menu_pos_restaurant_category_place" 
+        parent="point_of_sale.menu_point_config_product" sequence="40" />
+        
+    </data>
+</openerp>

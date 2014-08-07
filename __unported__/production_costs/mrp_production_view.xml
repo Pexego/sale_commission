@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!--EXTENDS MRP PRODUCTION FORM VIEW TO ADD SOME FIELDS -->
+        <record id="mrp_production_add_manpower_dates_form_view" model="ir.ui.view">
+            <field name="name">mrp.production.add.manpower.dates.form.view</field>
+            <field name="model">mrp.production</field>
+             <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook/page[@string='Extra Information']" position="before">
+                    <page string="Manpower/Duration" attrs="{'readonly':[('state', '=', 'done')]}">
+                        <separator string="Duration" colspan="4"/>
+                            <group colspan="4">
+                                <field name="begin_production_date" on_change="onchange_production_dates(begin_production_date,end_production_date, production_duration)"/>
+                                <field name="end_production_date" on_change="onchange_production_dates(begin_production_date,end_production_date, production_duration)"/>
+                                <field name="production_duration"/>
+                            </group>
+                        <newline/>
+                        <separator string="Manpower Specification" colspan="4"/>
+                            <field name="production_manpower" colspan="4" nolabel="1"/>
+                    </page>
+                </xpath>
+                <field name="move_created_ids2" position="after">
+                    <group col="4">
+                        <label/>
+                        <button name="action_compute_price" states="done" string="Compute Cost Price" type="object" colspan="2"/>
+                    </group>
+                </field>
+            </field>
+        </record>
+
+        <!--EXTENDS MRP PRODUCTION TREE VIEW TO SHOW FINAL COSTS FIELDS -->
+        <record id="mrp_production_add_final_costs_tree_view" model="ir.ui.view">
+            <field name="name">mrp.production.add.final.costs.tree.view</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <field name="state" position="after">
+                    <field name="total_production_cost"/>
+                    <!--field name="unit_production_cost"/>
+                    <field name="new_standard_price"/-->
+                </field>
+            </field>
+        </record>
+
+        <!--FORM VIEW OF PRODUCTION COSTS IN A MRP-PRODUCTION-->
+        <!--record id="mrp_production_add_costs_form_view" model="ir.ui.view">
+            <field name="name">mrp.production.add.costs.form.view</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook/page[@string='Extra Information']" position="after">
+                    <page string="Production Costs" attrs="{'invisible':[('state', '!=', 'done')]}">
+                        <separator string="Material Costs" colspan="4"/>
+                            <group colspan="4">
+                                <field name="products_total_cost"/>
+                                <field name="unit_product_cost"/>
+                            </group>
+                        <newline/>
+                        <separator string="Manpower Costs" colspan="4"/>
+                            <group colspan="4">
+                                <field name="manpower_cost"/>
+                                <field name="manpower_unit_cost"/>
+                            </group>
+                        <newline/>
+                        <separator string="Fixed Costs" colspan="4"/>
+                            <group colspan="4">
+                                <field name="total_fixed_cost"/>
+                                <field name="unit_fixed_cost"/>
+                            </group>
+                        <newline/>
+                        <separator string="Final Costs" colspan="4"/>
+                            <group colspan="4">
+                                <field name="total_production_cost"/>
+                                <field name="unit_production_cost"/>
+                                <field name="new_standard_price"/>
+                            </group>
+                    </page>
+                </xpath>
+            </field>
+        </record-->
+        
+        
+        <record id="mrp_production_add_costs_form_view" model="ir.ui.view">
+            <field name="name">mrp.production.add.costs.form.view</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/notebook/page[@string='Extra Information']" position="after">
+                    <page string="Production Costs" attrs="{'invisible':[('state', '!=', 'done')]}">
+                        <separator string="Total Costs" colspan="6"/>
+                            <group colspan="6">
+                                <field name="products_total_cost"/>
+                                <field name="manpower_cost"/>
+                                <field name="total_fixed_cost"/>
+                                <newline />
+                                <field name="total_production_cost"/>
+                            </group>
+                        <newline/>
+                        
+                        <separator string="Unit Costs by Product" colspan="4"/>
+                           
+                                <field name="unit_costs" cols="4" height="150" widget="one2many_list" nolabel="1" readonly='True'/>
+                            
+                    </page>
+                </xpath>
+            </field>
+        </record>
+            
+        
+        <record id="mrp_production_unit_costs_tree_view" model="ir.ui.view">
+            <field name="name">mrp.production.unit.costs.tree.view</field>
+            <field name="model">mrp.production.unit.costs</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Production costs by product">
+                    <field name="product_id"/>
+                    <field name="unit_product_cost"/>
+                    <field name="unit_fixed_cost"/>
+                    <field name="manpower_unit_cost"/>
+                    <field name="unit_production_cost"/>
+                    <field name="new_standard_price"/>
+                </tree>
+            </field>
+        
+        </record>
+
+    </data>
+</openerp>

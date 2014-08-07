@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+
+       <!-- Block reasons from-->
+
+       <record id="block_prodlot_cases_form" model="ir.ui.view">
+            <field name="name">block.prodlot.cases.form</field>
+            <field name="model">block.prodlot.cases</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Production Lots Blockade Cases">
+                    <field name="name" colspan="1"/>
+                    <field name="parent_block_prodlot" colspan="1"/>
+                    <separator colspan="4" string="Description"/>
+                    <field name="description" colspan="4" nolabel="1"/>
+                    <separator colspan="4" string="Productions Lots Blocked"/>
+                    <field name="blocked_prodlots_ids" colspan="4" nolabel="1"/>
+                    <group col="6" colspan="4">
+                        <field name="state" colspan="1"/>
+                        <button name="confirm_blockade_case" type="object" string="Confirm Blockade Case" states="in_review" colspan="1" icon="gtk-convert"/>
+                        <button name="cancel_blockade_case" type="object" string="Cancel Blockade Case" states="in_review" colspan="1" icon="gtk-cancel"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- Block reasons tree-->
+
+        <record id="block_prodlot_cases_tree" model="ir.ui.view">
+            <field name="name">block.prodlot.cases.tree</field>
+            <field name="model">block.prodlot.cases</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Production Lots Blockade Cases">
+                    <field name="parent_block_prodlot" select="1"/>
+                    <field name="name" select="1"/>
+                    <button name="confirm_blockade_case" type="object" string="Confirm Blockade Case" states="in_review" icon="gtk-convert"/>
+                    <button name="cancel_blockade_case" type="object" string="Cancel Blockade Case" states="in_review" icon="gtk-cancel"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="search_blockade_cases_filter">
+            <field name="name">Blockade cases Filter</field>
+            <field name="model">block.prodlot.cases</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Blockade cases Filter">
+                    <group col="10" colspan="4">
+                        <filter icon="terp-folder-green" name="review" string="In review" domain="[('state', '=', 'in_review')]" help="Blockade cases in review" />
+                        <filter icon="terp-folder-orange" name="confirm" string="Confirm" domain="[('state', '=', 'confirm')]" help="Blockade cases confirmed" />
+                        <filter icon="gtk-cancel" name="cancelled" string="In review" domain="[('state', '=', 'cancelled')]" help="Blockade cases cancelled" />
+                        <separator orientation="vertical"/>
+                        <field name="name"/>
+                        <field name="parent_block_prodlot"/>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Group By..." colspan="4" col="8">
+                        <filter string="Block prodlot" icon="terp-accessories-archiver" domain="[]" context="{'group_by':'parent_block_prodlot'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!--action to shows block cases in review-->
+
+        <record id="action_blockade_case_list" model="ir.actions.act_window">
+            <field name="name">Blockade Cases</field>
+            <field name="res_model">block.prodlot.cases</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_review": 1}</field>
+            <field name="help">This is the list of all blockade cases you recorded. When you select a case, you can see his affected lots and partners with these lots. By default, the list is filtred on the blockade cases that are in review but you can uncheck the 'In review' button to get all the blockade cases.</field>
+        </record>
+
+
+        <!--menu entry in traceability menu root for blockade cases-->
+
+        <menuitem id="open_menu_blockade_cases" name="Blockade Cases" parent="stock.menu_traceability" sequence="20"
+        action="action_blockade_case_list"/>
+
+    </data>
+</openerp>

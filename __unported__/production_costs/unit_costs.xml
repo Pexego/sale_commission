@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openerp>
+    <data>
+
+	<record id="mrp_production_unit_costs_tree_2_view" model="ir.ui.view">
+            <field name="name">mrp.production.unit.costs.tree.2.view</field>
+            <field name="model">mrp.production.unit.costs</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Production costs by product">
+                    <field name="product_id"/>
+                    <field name="unit_product_cost"/>
+                    <field name="unit_fixed_cost"/>
+                    <field name="manpower_unit_cost"/>
+                    <field name="unit_production_cost"/>
+                    <field name="new_standard_price"/>
+                    <field name="date"/>
+                    <field name="production_id"/>
+                </tree>
+            </field>
+        
+        </record>
+
+
+    <record id="production_unit_costs_search_view" model="ir.ui.view">
+        <field name="name">mrp.production.unit.costs.search</field>
+        <field name="model">mrp.production.unit.costs</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Production unit costs">
+                <field name="product_id"/>
+                <newline/>
+                 <group expand="0" string="Group By...">
+                        <filter string="Product" icon="terp-personal" domain="[]" context="{'group_by':'product_id'}"/>
+                        <filter string="Date" icon="terp-personal" domain="[]" context="{'group_by':'date'}"/>
+                    </group>
+           </search>
+        </field>
+    </record>
+
+     <record model="ir.actions.act_window" id="production_unit_costs_action">
+        <field name="name">Production unit costs</field>
+        <field name="res_model">mrp.production.unit.costs</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="mrp_production_unit_costs_tree_2_view"/>
+        <field name="search_view_id" ref="production_unit_costs_search_view"/>
+    </record>
+
+    <menuitem action="production_unit_costs_action" id="menu_production_unit_costs_form" parent="mrp.next_id_77"/>
+    </data>
+</openerp>    

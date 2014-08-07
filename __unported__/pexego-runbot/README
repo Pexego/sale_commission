@@ -1,0 +1,58 @@
+The OpenERP Runbot
+==================
+
+The OpenERP Runbot (or simply runbot) is a little program monitoring and
+running branches on Launchpad belonging to the different OpenERP projects,
+namely `openobject-server`, `openobject-addons`, `openobject-client-web`, and
+`openerp-web`. Doing so it generates a bunch of useful HTML reports.
+
+Initialy the goal was simply to have constantly an up-to-date (i.e. using the
+latest commits) running OpenERP server (with its associated web client) for
+testing and demoing purpose, for both the trunk and the stable (v6) branches.
+
+After a while, since installing some modules already performs some automatic
+tests, we changed a bit the runbot to also show on a web page if those tests
+passed or failed. Since then a few other changes were made (e.g. allow multiple
+Launchpad teams) but the overall goal is still the same.
+
+Installation
+------------
+
+Requirements:
+- python: coverage con easy_install
+- python: peewee
+- python: flask
+- python: flask-peewee
+- sqlite
+- git
+- bzr
+- hg
+- unzip
+
+Edit /etc/nginx/nginx.conf changing user by runbot's user and user group
+Edit   /etc/postgresql/8.4/main/pg_hba.conf replacing:
+local   all         all                               md5 by  local   all         all                               trust
+or create a .pgpass file in runbot user's home folder with his postgresql password.
+
+After, reiniciate postgres with:
+sudo /etc/init.d/postgresql restart
+
+Running the runbot
+------------------
+
+The runbot is a simple command-line tool. It doesn't do much in error reporting
+but its usage is straightforward. Running the following line (assuming the
+executable is on your path)
+
+  > openerp-runbot --help
+
+will provides most of the necessary detail.
+
+Typical usage resembles these lines:
+
+  > openerp-runbot.py --init
+  > openerp-runbot.py --run
+  > openerp-runbot.py --clean
+
+The first line creates some directories to hold the different branches and
+copies of the code to be run, and some configuration files.
