@@ -44,22 +44,41 @@ class stock_picking(osv.osv):
         'agent_ids':fields.many2many('sale.agent','sale_agent_clinic_rel', 'agent_id', 'clinic_id', 'Agentes' )
     }
 
+    def _create_invoice_line_agent(self,cr,uid,ids,agent_id,commission_id,invoice_line_id):
+        vals = {
+            'agent_id' : agent_id,
+            'commission_id' : commission_id,
+            'settled': False,
+            'invoice_line_id' : invoice_line_id
+        }
+        line_agent_id=self.pool.get('invoice.line.agent').create(cr, uid, vals)
+        self.pool.get('invoice.line.agent').calculate_commission(cr, uid, [line_agent_id])
+        return line_agent_id
+
     def _invoice_line_hook(self, cursor, user, move_line, invoice_line_id):
         '''Call after the creation of the invoice line'''
         super(stock_picking, self)._invoice_line_hook(cursor, user, move_line, invoice_line_id)
-
+        # import ipdb; ipdb.set_trace()
         if move_line and move_line.sale_line_id and move_line.sale_line_id.product_id.commission_exent != True :
             so_ref = move_line.sale_line_id.order_id
-            for so_agent_id in so_ref.sale_agent_ids:
-                vals = {
-                        'invoice_line_id': invoice_line_id,
-                        'agent_id': so_agent_id.agent_id.id,
-                        'commission_id': so_agent_id.commission_id.id,
-                        'settled': False
-                    }
+            line =  move_line.sale_line_id
+            if not line.line_agent_ids: #si la linea no tiene comissiones arrastro los del pedido a la linea de factura
+                for so_comm in line.order_id.sale_agent_ids:
+                    line_agent_id= self._create_invoice_line_agent(cursor,user,[],so_comm.agent_id.id,so_comm.commission_id.id,invoice_line_id)
+            else:
+                for l_comm in line.line_agent_ids:
+                    line_agent_id= self._create_invoice_line_agent(cursor,user,[],l_comm.agent_id.id,l_comm.commission_id.id,invoice_line_id)
 
-                line_agent_id=self.pool.get('invoice.line.agent').create(cursor, user, vals)
-                self.pool.get('invoice.line.agent').calculate_commission(cursor, user, [line_agent_id])
+            # for so_agent_id in so_ref.sale_agent_ids:
+            #     vals = {
+            #             'invoice_line_id': invoice_line_id,
+            #             'agent_id': so_agent_id.agent_id.id,
+            #             'commission_id': so_agent_id.commission_id.id,
+            #             'settled': False
+            #         }
+
+            #     line_agent_id=self.pool.get('invoice.line.agent').create(cursor, user, vals)
+            #     self.pool.get('invoice.line.agent').calculate_commission(cursor, user, [line_agent_id])
         return
 
 stock_picking()

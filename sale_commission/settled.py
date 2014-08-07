@@ -29,7 +29,7 @@ import tools
 
 class settled_wizard (osv.osv_memory):
     """settled.wizard"""
-    
+
     _name = 'settled.wizard'
     _columns = {
         #'settlement':fields.selection((('m', 'Monthly'),('t', 'Quarterly'),('s', 'Semiannual'),('a', 'Annual')), 'Settlement period', required=True),
@@ -46,7 +46,7 @@ class settled_wizard (osv.osv_memory):
 
             pool_liq = self.pool.get('settlement')
             liq_id = pool_liq.search(cr, uid, [('date_to', '>=', o.date_from)])
-            
+
             vals={
                 'name': o.date_from+ " // " + o.date_to,
                 'date_from':o.date_from,
@@ -60,14 +60,14 @@ class settled_wizard (osv.osv_memory):
             'type': 'ir.actions.act_window_close',
         }
 
-      
+
     def action_cancel(self, cr, uid, ids, conect=None):
         """CANCEL LIQUIDACIÓN"""
         return {
             'type': 'ir.actions.act_window_close',
         }
 
-        
+
 
 settled_wizard()
 
@@ -94,14 +94,13 @@ class recalculate_commision_wizard (osv.osv_memory):
               'INNER JOIN invoice_line_agent ON invoice_line_agent.invoice_line_id=account_invoice_line.id ' \
               'INNER JOIN account_invoice ON account_invoice_line.invoice_id = account_invoice.id ' \
               'WHERE invoice_line_agent.agent_id in (' + ",".join(map(str, context['active_ids'])) + ') AND invoice_line_agent.settled=False ' \
-              'AND account_invoice.state<>\'draft\' AND account_invoice.type=\'out_invoice\''\
+              'AND account_invoice.state not in (\'draft\',\'cancel\') AND account_invoice.type in (\'out_invoice\',\'out_refund\')'\
               'AND account_invoice.date_invoice >= \'' + o.date_from + '\' AND account_invoice.date_invoice <= \'' + o.date_to +'\''\
               ' AND account_invoice.company_id = ' + str(user.company_id.id)
 
             cr.execute(sql)
             res = cr.fetchall()
             inv_line_agent_ids = [x[0] for x in res]
-
             self.pool.get ('invoice.line.agent').calculate_commission( cr, uid, inv_line_agent_ids)
 
 
@@ -141,18 +140,18 @@ class settlement (osv.osv):
         'state': lambda *a: 'settled'
     }
 
-    def action_invoice_create(self, cursor, user, ids, journal_id, product_id, context=None):
+    def action_invoice_create(self, cursor, user, ids, journal_id, product_id,mode,context=None):
 
         agents_pool=self.pool.get('settlement.agent')
         res={}
         for settlement in self.browse(cursor, user, ids, context=context):
             settlement_agent_ids = map(lambda x: x.id, settlement.settlement_agent_id)
-            invoices_agent = agents_pool.action_invoice_create(cursor, user, settlement_agent_ids, journal_id, product_id)
+            invoices_agent = agents_pool.action_invoice_create(cursor, user, settlement_agent_ids, journal_id, product_id,mode)
 
             res[settlement.id] = invoices_agent.values()
         return res
 
-            
+
 
 
     def calcula(self, cr, uid, ids, agent_ids, date_from, date_to):
@@ -168,7 +167,7 @@ class settlement (osv.osv):
             self.pool.get('settlement.agent').calcula(cr, uid, liq_agent_id, date_from, date_to)
             liq_agent = self.pool.get('settlement.agent').browse(cr, uid, liq_agent_id)
             total = total + liq_agent.total
-            
+
         return self.write (cr, uid, ids, {'total': total})
 
     def action_cancel(self, cr, uid, ids, context=None):
@@ -198,7 +197,7 @@ class settlement_agent (osv.osv):
     """Liquidaciones de Agentes"""
 
     _name = 'settlement.agent'
-
+    _rec_name = 'agent_id'
     def _invoice_line_hook(self, cursor, user, move_line, invoice_line_id):
         '''Call after the creation of the invoice line'''
         return
@@ -215,7 +214,7 @@ class settlement_agent (osv.osv):
         '''Call after the creation of the invoice'''
         return
 
-    
+
     _columns = {
         'agent_id': fields.many2one('sale.agent', 'Agent', required=True, select=1),
         'total_per': fields.float('Total percentages', readonly=True),
@@ -232,7 +231,7 @@ class settlement_agent (osv.osv):
         return False
 
 
-    def action_invoice_create(self, cursor, user, ids, journal_id, product_id, context=None):
+    def action_invoice_create(self, cursor, user, ids, journal_id, product_id,mode,context=None):
         '''Return ids of created invoices for the settlements'''
 
         invoice_obj = self.pool.get('account.invoice')
@@ -241,12 +240,12 @@ class settlement_agent (osv.osv):
         res = {}
 
         for settlement in self.browse(cursor, user, ids, context=context):
-
+            if (not settlement.total_sections) and (not settlement.total):
+                continue
             payment_term_id = False
             partner = settlement.agent_id and settlement.agent_id.partner_id
             if not partner:
-                raise osv.except_osv(_('Error, partner fail !'),
-                    _('Agent to settle hasn\'t assigned partner.'))
+                continue
 
            #El tipo es de facura de proveedor
             account_id = partner.property_account_payable.id
@@ -258,7 +257,7 @@ class settlement_agent (osv.osv):
 
             invoice_vals = {
                 'name': settlement.settlement_id.name,
-                'origin': (settlement.settlement_id.name or '') ,
+                'origin': (settlement.settlement_id.name or ''),
                 'type': 'in_invoice',
                 'account_id': account_id,
                 'partner_id': partner.id,
@@ -299,31 +298,50 @@ class settlement_agent (osv.osv):
                 )
             else:
                 tax_ids = map(lambda x: x.id, taxes)
-            for invoice in settlement.invoices:
-                origin = invoice.invoice_number
-                name = invoice.invoice_number
-                price_unit = invoice.settled_amount
-                discount = 0
 
-                #set UoS if it's a sale and the picking doesn't have one
-                uos_id =  False
-
-                account_id = self.pool.get('account.fiscal.position').map_account(cursor, user, partner.property_account_position, account_id)
+            account_id = self.pool.get('account.fiscal.position').map_account(cursor, user, partner.property_account_position, account_id)
+            uos_id =  False  #set UoS if it's a sale and the picking doesn't have one
+            if mode == 'invoice':
+                for invoice in settlement.invoices:
+                    invoice_line_id = invoice_line_obj.create(cursor, user, {
+                        'name': invoice.invoice_number,
+                        'origin': invoice.invoice_number,
+                        'invoice_id': invoice_id,
+                        'uos_id': uos_id,
+                        'product_id': product.id,
+                        'account_id': account_id,
+                        'price_unit': invoice.settled_amount,
+                        'discount': 0,
+                        'quantity': 1,
+                        'invoice_line_tax_id': [(6, 0, tax_ids)],
+                        }, context=context)
+            elif mode == 'line':
+                for line in settlement.lines:
+                    invoice_line_id = invoice_line_obj.create(cursor, user, {
+                        'name': line.invoice_id.number,
+                        'origin': line.invoice_id.number,
+                        'invoice_id': invoice_id,
+                        'uos_id': uos_id,
+                        'product_id': product.id,
+                        'account_id': account_id,
+                        'price_unit': line.commission,
+                        'discount': 0,
+                        'quantity': 1,
+                        'invoice_line_tax_id': [(6, 0, tax_ids)],
+                        }, context=context)
+            elif mode == 'agent':
                 invoice_line_id = invoice_line_obj.create(cursor, user, {
-                    'name': name,
-                    'origin': origin,
-                    'invoice_id': invoice_id,
-                    'uos_id': uos_id,
-                    'product_id': product.id,
-                    'account_id': account_id,
-                    'price_unit': price_unit,
-                    'discount': discount,
-                    'quantity': 1,
-                    'invoice_line_tax_id': [(6, 0, tax_ids)],
-                    #'account_analytic_id': account_analytic_id,
-                    }, context=context)
-                self._invoice_line_hook(cursor, user, invoice, invoice_line_id)
-
+                        'name': settlement.settlement_id.name or '',
+                        'origin': settlement.settlement_id.name or '',
+                        'invoice_id': invoice_id,
+                        'uos_id': uos_id,
+                        'product_id': product.id,
+                        'account_id': account_id,
+                        'price_unit': settlement.total,
+                        'discount': 0,
+                        'quantity': 1,
+                        'invoice_line_tax_id': [(6, 0, tax_ids)],
+                        }, context=context)
             invoice_obj.button_compute(cursor, user, [invoice_id], context=context,
                     set_total=(type in ('in_invoice', 'in_refund')))
             self._invoice_hook(cursor, user, settlement, invoice_id)
@@ -338,7 +356,7 @@ class settlement_agent (osv.osv):
               'INNER JOIN invoice_line_agent ON invoice_line_agent.invoice_line_id=account_invoice_line.id ' \
               'INNER JOIN account_invoice ON account_invoice_line.invoice_id = account_invoice.id ' \
               'WHERE invoice_line_agent.agent_id=' + str(set_agent.agent_id.id) + ' AND invoice_line_agent.settled=True ' \
-              'AND account_invoice.state<>\'draft\' AND account_invoice.type=\'out_invoice\''\
+              'AND account_invoice.state not in (\'draft\',\'cancel\') AND account_invoice.type=\'out_invoice\''\
               'AND account_invoice.date_invoice >= \'' + date_from + '\' AND account_invoice.date_invoice <= \'' + date_to +'\''\
               ' AND account_invoice.company_id = ' + str(user.company_id.id)
 
@@ -352,13 +370,14 @@ class settlement_agent (osv.osv):
               'INNER JOIN invoice_line_agent ON invoice_line_agent.invoice_line_id=account_invoice_line.id ' \
               'INNER JOIN account_invoice ON account_invoice_line.invoice_id = account_invoice.id ' \
               'WHERE invoice_line_agent.agent_id=' + str(set_agent.agent_id.id) + ' AND invoice_line_agent.settled=False ' \
-              'AND account_invoice.state<>\'draft\' AND account_invoice.type=\'out_invoice\''\
+              'AND account_invoice.state not in (\'draft\',\'cancel\') AND account_invoice.type in (\'out_invoice\',\'out_refund\')'\
               'AND account_invoice.date_invoice >= \'' + date_from + '\' AND account_invoice.date_invoice <= \'' + date_to +'\''\
               ' AND account_invoice.company_id = ' + str(user.company_id.id)
-       
+
         cr.execute(sql)
         res = cr.fetchall()
         inv_line_ids = [x[0] for x in res]
+
         total_per = 0
         total_sections = 0
         total = 0
@@ -371,7 +390,7 @@ class settlement_agent (osv.osv):
 
             # Marca la comision en la factura como liquidada y establece la cantidad
             # Si es por tramos la cantidad será cero, pero se reflejará sobre el tramo del Agente
-            
+
 
             if line.commission_id.type == "fijo":
                 total_per = total_per + line.commission
@@ -380,26 +399,29 @@ class settlement_agent (osv.osv):
             if line.commission_id.type == "tramos":
                 if line.invoice_line_id.product_id.commission_exent != True:
                     # Hacemos un agregado de la base de cálculo agrupándolo por las distintas comisiones en tramos que tenga el agente asignadas
+                    if line.invoice_line_id.invoice_id.type == 'out_refund':
+                        sign_price = - line.invoice_line_id.price_subtotal
+                    else:
+                        sign_price = line.invoice_line_id.price_subtotal
+
                     if  line.commission_id.id in sections:
-                        sections[line.commission_id.id]['base'] = sections[line.commission_id.id]['base'] + line.invoice_line_id.price_subtotal
+                        sections[line.commission_id.id]['base'] = sections[line.commission_id.id]['base'] + sign_price
                         sections[line.commission_id.id]['lines'].append(line)                   # Añade la línea de la que se añade esta base para el cálculo por tramos
                     else:
-                        sections[line.commission_id.id] = {'type': line.commission_id, 'base':line.invoice_line_id.price_subtotal, 'lines':[line]}
-
-        #Tramos para cada tipo de comisión creados 
-
+                        sections[line.commission_id.id] = {'type': line.commission_id, 'base':sign_price, 'lines':[line]}
+        #Tramos para cada tipo de comisión creados
         for tramo in sections:
             #Cálculo de la comisión  para cada tramo
             sections[tramo].update({'commission': sections[tramo]['type'].calcula_tramos(sections[tramo]['base'])})
             total_sections = total_sections+sections[tramo]['commission']
             # reparto de la comisión para cada linea
-            
+
             for linea_tramo in  sections[tramo]['lines']:
-                com_por_linea = sections[tramo]['commission']* (linea_tramo.invoice_line_id.price_subtotal/sections[tramo]['base'])
+                com_por_linea = sections[tramo]['commission']* (linea_tramo.invoice_line_id.price_subtotal/(abs(sections[tramo]['base']) or 1.0))
                 linea_tramo.write({'commission':com_por_linea})
                 inv_ag_ids = self.pool.get('invoice.line.agent').search(cr, uid, [('invoice_line_id', '=', linea_tramo.invoice_line_id.id), ('agent_id', '=', set_agent.agent_id.id)])
                 self.pool.get('invoice.line.agent').write(cr, uid, inv_ag_ids, {'settled': True, 'quantity': com_por_linea})
-            
+
 
         total = total_per + total_sections
         self.write (cr, uid, ids, {'total_per': total_per, 'total_sections': total_sections, 'total': total})
@@ -408,7 +430,7 @@ settlement_agent()
 
 class settlement_line (osv.osv):
     """Línea de las liquidaciones de los agentes
-     Una línea por línea de factura 
+     Una línea por línea de factura
     """
 
     _name = 'settlement.line'
@@ -438,7 +460,11 @@ class settlement_line (osv.osv):
                 invoice_line_amount = line.invoice_line_id.price_subtotal
                 if commission_app.type=="fijo":
                     commission_per = commission_app.fix_qty
-                    amount = amount + line.invoice_line_id.price_subtotal * float(commission_per) / 100
+                    # Para tener en cuenta las rectificativas
+                    if line.invoice_line_id.invoice_id.type == 'out_refund':
+                        amount = amount - line.invoice_line_id.price_subtotal * float(commission_per) / 100
+                    else:
+                        amount = amount + line.invoice_line_id.price_subtotal * float(commission_per) / 100
 
                 elif commission_app.type=="tramos":
                     invoice_line_amount = 0
@@ -472,7 +498,7 @@ class settled_invoice_agent(osv.osv):
 
     def init(self, cr):
         tools.sql.drop_view_if_exists(cr,  "settled_invoice_agent")
-        
+
         cr.execute("""
             create or replace view settled_invoice_agent as (
             SELECT  (account_invoice_line.invoice_id*10000+settlement_agent.agent_id) as id, settlement_agent.id as settlement_agent_id,

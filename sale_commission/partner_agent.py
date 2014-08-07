@@ -50,7 +50,7 @@ class res_partner_agent(osv.osv):
     _columns = {
         'partner_id':fields.many2one('res.partner', 'Partner', required=True, ondelete='cascade', help='', select=1),
         'agent_id':fields.many2one('sale.agent', 'Agent', required=True, ondelete='cascade', help=''),
-        'commission_id':fields.many2one('commission', 'Applied commission', required=True, ondelete='cascade', help=''),
+        'commission_id':fields.many2one('commission', 'Applied commission', required=True, help=''),
         'type': fields.related('agent_id', 'type', type="selection", selection=[('asesor', 'Adviser'), ('comercial', 'Commercial')], readonly=True,
                     store={'sale.agent': (_get_partner_agents_to_update_from_sale_agents, ['type'], 10),
                             'res.partner.agent': (lambda self, cr, uid, ids, c={}: ids, None, 20)})

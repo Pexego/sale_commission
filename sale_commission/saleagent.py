@@ -32,7 +32,8 @@ class commission(osv.osv):
         'name': fields.char('Name', size=64, required=True),
         'type': fields.selection((('fijo', 'Fix percentage'), ('tramos', 'By sections')), 'Type', required=True),
         'fix_qty': fields.float('Fix Percentage'),
-        'sections': fields.one2many('commission.section', 'commission_id', 'Sections')
+        'sections': fields.one2many('commission.section', 'commission_id', 'Sections'),
+        'product_agent_ids':fields.one2many('product.agent.commission', 'commission_id', 'Agents')
     }
     _defaults = {
         'type' : lambda *a: 'fijo',
@@ -40,9 +41,8 @@ class commission(osv.osv):
 
     def calcula_tramos(self, cr, uid, ids, base):
         commission = self.browse(cr, uid, ids)[0]
-        #Cálculo de tramos
         for section in commission.sections:
-            if base >= section.commission_from and (base < section.commission_until or section.commission_until == 0):
+            if abs(base) >= section.commission_from and (abs(base) < section.commission_until or section.commission_until == 0):
                 res = base * section.percent / 100.0
                 return res
         return 0.0
@@ -59,7 +59,7 @@ class commission_section(osv.osv):
         'commission_from': fields.float('From'),
         'commission_until': fields.float('Until'),
         'percent': fields.float('Percent'),
-        'commission_id': fields.many2one('commission', 'Commission')
+        'commission_id': fields.many2one('commission', 'Commission', required=True)
 
     }
 

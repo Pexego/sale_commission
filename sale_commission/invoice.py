@@ -31,19 +31,24 @@ class invoice_line_agent(osv.osv):
     _name = "invoice.line.agent"
 
     _columns = {
-        'invoice_line_id':fields.many2one('account.invoice.line', 'Invoice Line', required=True, ondelete='cascade', help=''),
+        'invoice_line_id':fields.many2one('account.invoice.line', 'Invoice Line', required=False, ondelete='cascade', help=''),
         'invoice_id':fields.related('invoice_line_id', 'invoice_id', type='many2one', relation='account.invoice', string='Invoice'),
         'invoice_date':fields.related('invoice_id',type='date_invoice', readonly=True),
         'agent_id': fields.many2one('sale.agent', 'Agent', required=True, ondelete='cascade', help=''),
-        'commission_id':fields.many2one('commission', 'Applied commission', required=True, ondelete='cascade', help=''),
+        'commission_id':fields.many2one('commission', 'Applied commission', required=True, help=''),
         'settled':fields.boolean('Settled', readonly=True),
         'quantity':fields.float('Settled amount')
     }
     _defaults = {
         'settled': lambda *a: False,
-        'quantity':lambda *a: 0
      }
 
+
+    def copy_data(self, cr, uid, id, default=None, context=None):
+        if not default:
+            default = {}
+        default.update({'settled': False})
+        return super(invoice_line_agent, self).copy_data(cr, uid, id, default, context=context)
 
     def calculate_commission (self, cr, uid, ids):
         for line_agent in self.browse(cr,uid,ids):
@@ -126,9 +131,15 @@ class account_invoice(osv.osv):
     def _refund_cleanup_lines(self, cr, uid, lines):
         """ugly function to map all fields of account.invoice.line when creates refund invoice"""
         res = super(account_invoice, self)._refund_cleanup_lines(cr, uid, lines)
+        # import ipdb; ipdb.set_trace()
         for line in res:
             if 'commission_ids' in line[2]:
-                line[2]['commission_ids'] = [(6,0, line[2].get('commission_ids', [])) ]
+                duply_ids = []
+                for cm_id in line[2].get('commission_ids', []):
+                    dup_id = self.pool.get("invoice.line.agent").copy(cr, uid, cm_id, {'settled': False} )
+                    duply_ids.append(dup_id)
+                # line[2]['commission_ids'] = [(6,0, line[2].get('commission_ids', [])) ]
+                line[2]['commission_ids'] = [(6,0, duply_ids) ]
             
         return res
 

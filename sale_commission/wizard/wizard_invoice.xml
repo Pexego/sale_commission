@@ -8,9 +8,11 @@
             <field name="arch" type="xml">
               <form string="Create invoices">
                     <separator colspan="4" string="Create invoice" />
-                    <field name="journal_id"/>
+                    <field name="journal_id" domain="[('type','=','purchase')]"/>
                     <newline/>
                     <field name="product_id"/>
+                    <newline/>
+                    <field name="mode"/>
                     <newline/>
                     <button special="cancel" string="_Cancel" icon='gtk-cancel'/>
                     <button name="create_invoice" string="Create" type="object" icon="terp-gtk-go-back-rtl"/>
