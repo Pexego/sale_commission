@@ -22,10 +22,14 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Commissions and Agents" >
-                    <field name="agent_id" on_change="onchange_agent_id(agent_id)"/>
-                    <field name="commission_id"  on_change="onchange_commission_id(agent_id, commission_id)" />
-                    <field name="settled" />
-                    <field name="quantity" readonly="1"/>
+                    <sheet>
+                        <group>
+                            <field name="agent_id" on_change="onchange_agent_id(agent_id)"/>
+                            <field name="commission_id"  on_change="onchange_commission_id(agent_id, commission_id)" />
+                            <field name="settled" />
+                            <field name="quantity" readonly="1"/>
+                        </group>
+                    </sheet>
                 </form>
             </field>
         </record>
@@ -36,18 +40,7 @@
             <field name="type">form</field>
             <field name="inherit_id" ref="account.view_invoice_line_form" />
             <field name="arch" type="xml">
-                <separator string="Notes" colspan="4"/>
-                <field colspan="4" name="note" nolabel="1"/>
-                <separator string="Notes" position="replace">
-                    <separator string="Notes" colspan="2"/>
-                </separator>
-                <field name="note" position="replace">
-                    <field name="note" colspan="2" nolabel="1"/>
-                </field>
-                <separator string="Notes" position="before">
-                    <separator string="Commissions" colspan="2"/>
-                </separator>
-                <field name="note" position="before">
+                <field name="invoice_line_tax_id" position="before">
                     <field name="commission_ids" colspan="2" nolabel="1"/>
                 </field>
              </field>

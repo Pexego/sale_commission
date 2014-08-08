@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-        
+
 <!--
     =======================
     Saleagent Information
@@ -29,33 +29,36 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Agent" col="6">
-                    
-                    <field name="name" select="1"/>
-                    <field name="code" select="1"/>
-                    <field name="type" select="1"/>
-                    <group string="Related entity or employee" colspan="2">
-                        <field attrs="{'required':[('type','=','asesor')], 'invisible':[('type','!=','asesor')]}" domain="[('agent','=',True)]" name="partner_id" select="2"/>
-                        <field attrs="{'required':[('type','=','comercial')], 'invisible':[('type','!=','comercial')]}" name="employee_id" select="2"/>
-                    </group>
-                    <field domain="[('parent_id','=',False),('type_tax_use','&lt;&gt;','purchase')]" name="retention_id"/>
-                    <!--label colspan="2"/-->
-                    <field name="active"/>
-                    <notebook colspan="4">
-                        <page string="Commission">
-                            <group>
-                                <field name="settlement"/>
+                    <sheet>
+                        <group>
+                            <field name="name" select="1"/>
+                            <field name="code" select="1"/>
+                            <field name="type" select="1"/>
+                            <group string="Related entity or employee" colspan="2">
+                                <field attrs="{'required':[('type','=','asesor')], 'invisible':[('type','!=','asesor')]}" domain="[('agent','=',True)]" name="partner_id" select="2"/>
+                                <field attrs="{'required':[('type','=','comercial')], 'invisible':[('type','!=','comercial')]}" name="employee_id" select="2"/>
                             </group>
-                            <group>
-                                <field name="commission"/>
-                            </group>
-                        </page>
-                        <page string="Customer assigned">
-                            <field colspan="4" name="customer" nolabel="1" readonly="1"/>
-                        </page>
-                        <page string="Settlements executed">
-                            <field colspan="4" name="settlement_ids" nolabel="1" readonly="1"/>
-                        </page>
-                    </notebook>
+                            <field domain="[('parent_id','=',False),('type_tax_use','&lt;&gt;','purchase')]" name="retention_id"/>
+                            <!--label colspan="2"/-->
+                            <field name="active"/>
+                            <notebook colspan="4">
+                                <page string="Commission">
+                                    <group>
+                                        <field name="settlement"/>
+                                    </group>
+                                    <group>
+                                        <field name="commission"/>
+                                    </group>
+                                </page>
+                                <page string="Customer assigned">
+                                    <field colspan="4" name="customer" nolabel="1" readonly="1"/>
+                                </page>
+                                <page string="Settlements executed">
+                                    <field colspan="4" name="settlement_ids" nolabel="1" readonly="1"/>
+                                </page>
+                            </notebook>
+                        </group>
+                    </sheet>
                 </form>
             </field>
         </record>
@@ -95,7 +98,7 @@
 
         </record>
 
-        
+
 
         <record model="ir.ui.view" id="commission_tree">
             <field name="name">commission.tree</field>
@@ -115,34 +118,38 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Commission">
-                    <separator string="General info." colspan="4"/>
-                    <field name="name" select="1"/>
-                    <field name="type" select="1"/>
-                    <group string="Definition of rates" colspan="4">
-                        <field name="fix_qty"  attrs="{'invisible':[('type','!=','fijo')]}"/>
-                        <field name="sections" widget="one2many_list" colspan="4" nolabel="1"  attrs="{'invisible':[('type','!=','tramos')]}">
-                            <tree string="sections" editable="top">
-                                <field name="commission_from"/>
-                                <field name="commission_until"/>
-                                <field name="percent"/>
-                            </tree>
-                        </field>
-                    </group>
-                    <field name="product_agent_ids" nolabel="1" colspan="4">
-                            <tree string="Agents and Commissions" editable="top">
-                                <field name="agent_ids">
-                                    <tree>
-                                        <field name="name"/>
+                    <sheet>
+                        <group>
+                            <separator string="General info." colspan="4"/>
+                            <field name="name" select="1"/>
+                            <field name="type" select="1"/>
+                            <group string="Definition of rates" colspan="4">
+                                <field name="fix_qty"  attrs="{'invisible':[('type','!=','fijo')]}"/>
+                                <field name="sections" widget="one2many_list" colspan="4" nolabel="1"  attrs="{'invisible':[('type','!=','tramos')]}">
+                                    <tree string="sections" editable="top">
+                                        <field name="commission_from"/>
+                                        <field name="commission_until"/>
+                                        <field name="percent"/>
                                     </tree>
                                 </field>
-                                <field name="product_id"/>
-                            </tree>
-                            <form>
-                                <field name="product_id"/>
-                                <separator colspan="4" string="Agents/Commissions"/>
-                                <field name="agent_ids"  colspan="4" nolabel="1"/>
-                            </form>
-                    </field>
+                            </group>
+                            <field name="product_agent_ids" nolabel="1" colspan="4">
+                                    <tree string="Agents and Commissions" editable="top">
+                                        <field name="agent_ids">
+                                            <tree>
+                                                <field name="name"/>
+                                            </tree>
+                                        </field>
+                                        <field name="product_id"/>
+                                    </tree>
+                                    <form>
+                                        <field name="product_id"/>
+                                        <separator colspan="4" string="Agents/Commissions"/>
+                                        <field name="agent_ids"  colspan="4" nolabel="1"/>
+                                    </form>
+                            </field>
+                        </group>
+                    </sheet>
                 </form>
             </field>
         </record>
