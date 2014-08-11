@@ -43,7 +43,6 @@ class settled_invoice_wizard (orm.TransientModel):
     def create_invoice(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
-        # import ipdb; ipdb.set_trace()
         data_pool = self.pool.get('ir.model.data')
         settlement_obj = self.pool.get('settlement')
 

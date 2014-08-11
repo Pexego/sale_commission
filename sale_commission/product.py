@@ -45,5 +45,6 @@ class product_product(orm.Model):
     _inherit = 'product.product'
     _columns = {
         'product_agent_ids': fields.one2many('product.agent.commission',
-                                             'product_id', 'Agents')
+                                             'product_id', 'Agents'),
+        'commission_exent': fields.boolean('Commission exent')
     }

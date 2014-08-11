@@ -219,10 +219,10 @@
           <para style="terp_default_Centre_8">[[ invoice.partner_id.name or '' ]]</para>
         </td>
         <td>
-          <para style="terp_default_Centre_8">[[ formatLang(invoice.invoice_amount or 0.0) ]] [[ invoice.currency_id and invoice.currency_id.code or '']]</para>
+          <para style="terp_default_Centre_8">[[ formatLang(invoice.invoice_amount or 0.0) ]] [[ invoice.invoice_id and invoice.invoice_id.currency_id and invoice.invoice_id.currency_id.name or '']]</para>
         </td>
         <td>
-          <para style="terp_default_Centre_8">[[ formatLang(invoice.settled_amount or 0.0) ]] [[ invoice.currency_id and invoice.currency_id.code or '']]</para>
+          <para style="terp_default_Centre_8">[[ formatLang(invoice.settled_amount or 0.0) ]] [[ invoice.invoice_id and invoice.invoice_id.currency_id and invoice.invoice_id.currency_id.name or '']]</para>
         </td>
       </tr>
     </blockTable>

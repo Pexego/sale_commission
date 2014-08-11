@@ -28,6 +28,7 @@
                     'account',
                     'product',
                     'sale',
+                    'sale_stock',
                     'hr',
                     'stock'
                 ],

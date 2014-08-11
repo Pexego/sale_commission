@@ -131,8 +131,8 @@ class settlement (orm.Model):
                                                'Settlement agents',
                                                readonly=True),
         'date': fields.datetime('Created Date', required=True),
-        'state': fields.selection([('invoiced', 'Invoiced'),
-                                   ('settled', 'Settled'),
+        'state': fields.selection([('settled', 'Settled'),
+                                   ('invoiced', 'Invoiced'),
                                    ('cancel', 'Cancel')],
                                   'State', required=True, readonly=True)
     }
@@ -213,14 +213,6 @@ class settlement_agent (orm.Model):
         '''Call after the creation of the invoice line'''
         return
 
-    def _get_address_invoice(self, cursor, user, settlement):
-        '''Return {'contact': address, 'invoice': address} for invoice'''
-        partner_obj = self.pool.get('res.partner')
-        partner = settlement.agent_id.partner_id
-
-        return partner_obj.address_get(cursor, user, [partner.id],
-                                       ['contact', 'invoice'])
-
     def _invoice_hook(self, cursor, user, picking, invoice_id):
         '''Call after the creation of the invoice'''
         return
@@ -262,9 +254,6 @@ class settlement_agent (orm.Model):
             # El tipo es de facura de proveedor
             account_id = partner.property_account_payable.id
 
-            address_contact_id, address_invoice_id = \
-                self._get_address_invoice(cursor, user, settlement).values()
-
             # No se agrupa
 
             invoice_vals = {
@@ -273,8 +262,6 @@ class settlement_agent (orm.Model):
                 'type': 'in_invoice',
                 'account_id': account_id,
                 'partner_id': partner.id,
-                'address_invoice_id': address_invoice_id,
-                'address_contact_id': address_contact_id,
                 'payment_term': payment_term_id,
                 'fiscal_position': partner.property_account_position.id
             }

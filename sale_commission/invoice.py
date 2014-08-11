@@ -132,7 +132,7 @@ class account_invoice(orm.Model):
         'agent_id': fields.many2one('sale.agent', 'Agent'),
         'agent_code': fields.related('agent_id', 'code', readonly=True,
                                      type='char', string='Agent code'),
-        'country': fields.related('address_invoice_id', 'country_id',
+        'country': fields.related('partner_id', 'country_id',
                                   readonly=True, type='many2one',
                                   string='Country', relation='res.country'),
     }

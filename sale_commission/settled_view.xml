@@ -8,10 +8,12 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Select period to Settle">
-                    <field name="date_from" />
-                    <field name="date_to" />
-                        <button icon="gtk-cancel" name="action_cancel" type="object" special="cancel" string="Cancel"/>
-                        <button icon="gtk-ok" name="settlement_exec" string="Run Settlement Agents" type="object"/>
+                    <group>
+                        <field name="date_from" />
+                        <field name="date_to" />
+                            <button icon="gtk-cancel" name="action_cancel" type="object" special="cancel" string="Cancel"/>
+                            <button icon="gtk-ok" name="settlement_exec" string="Run Settlement Agents" type="object"/>
+                    </group>
                 </form>
             </field>
         </record>
@@ -22,11 +24,13 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Select period to recalculate commissions">
-                    <field name="date_from" />
-                    <field name="date_to" />
-                    <group col="4" colspan="4">
-                        <button icon="gtk-cancel" name="action_cancel" type="object" special="cancel" string="Cancel"/>
-                        <button icon="gtk-ok" name="recalculate_exec" string="Recalculate agents commissions" type="object"/>
+                    <group>
+                        <field name="date_from" />
+                        <field name="date_to" />
+                        <group col="4" colspan="4">
+                            <button icon="gtk-cancel" name="action_cancel" type="object" special="cancel" string="Cancel"/>
+                            <button icon="gtk-ok" name="recalculate_exec" string="Recalculate agents commissions" type="object"/>
+                        </group>
                     </group>
                 </form>
             </field>
@@ -42,14 +46,14 @@
             target="new"
             id="action_agents_settlement"/>
 
-       <record id="action_wizard_settled" model="ir.values">
+       <!--record id="action_wizard_settled" model="ir.values">
             <field name="object" eval="1" />
             <field name="name">Perform agents settlements</field>
             <field name="key2">client_action_multi</field>
             <field name="value" eval="'ir.actions.act_window,' + str(ref('action_agents_settlement'))"/>
             <field name="key">action</field>
             <field name="model">sale.agent</field>
-        </record>
+        </record-->
 
 
         <act_window name="Recalculate agents commissions"
@@ -61,14 +65,14 @@
             target="new"
             id="action_recalculate_commission"/>
 
-       <record id="action_wizard_recalculate_commission" model="ir.values">
+       <!--record id="action_wizard_recalculate_commission" model="ir.values">
             <field name="object" eval="1" />
             <field name="name">Recalculate agents commissions</field>
             <field name="key2">client_action_multi</field>
             <field name="value" eval="'ir.actions.act_window,' + str(ref('action_recalculate_commission'))"/>
             <field name="key">action</field>
             <field name="model">sale.agent</field>
-        </record>
+        </record-->
 
 
 
@@ -254,6 +258,11 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Settlements">
+                    <header>
+                        <button name="%(action_settled_invoice)d" string="Create Invoices"  attrs="{'invisible': [('state','!=','settled')]}"  type="action" class="oe_highlight"  />
+                        <button string="Cancel" name="action_cancel" type="object" states="settled"/>
+                        <field name="state" widget="statusbar" statusbar_visible="invoiced,settled,cancel"/>
+                    </header>
                     <sheet>
                         <group>
                             <field name="name"/>
@@ -270,9 +279,6 @@
                                     <field name="total" sum="Settled total"/>
                                 </tree>
                             </field>
-                            <field name="state"/>
-                            <button name="%(action_settled_invoice)d" string="Create Invoices"  attrs="{'invisible': [('state','!=','settled')]}"  type="action" icon="terp-gtk-go-back-rtl" />
-                            <button string="Cancel" name="action_cancel" type="object" states="settled"/>
                         </group>
                     </sheet>
                 </form>

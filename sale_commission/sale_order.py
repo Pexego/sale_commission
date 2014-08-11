@@ -23,6 +23,7 @@
 
 from openerp.osv import fields, orm
 from openerp.tools.translate import _
+import itertools
 
 
 class sale_order_agent(orm.Model):
@@ -94,19 +95,21 @@ class sale_order(orm.Model):
                                                   [('readonly', False)]})
     }
 
-    def onchange_partner_id(self, cr, uid, ids, part):
+    def onchange_partner_id(self, cr, uid, ids, part, context=None):
         """
             heredamos el evento de cambio del campo partner_id para actualizar
             el campo agent_id
         """
         sale_agent_ids = []
-        res = super(sale_order, self).onchange_partner_id(cr, uid, ids, part)
+        res = super(sale_order, self).onchange_partner_id(cr, uid, ids, part,
+                                                          context)
         sale_order_agent = self.pool.get('sale.order.agent')
         if ids:
             sale_order_agent.unlink(cr, uid, sale_order_agent.search(
-                cr, uid, [('sale_id', '=', ids)]))
+                cr, uid, [('sale_id', '=', ids)]), context=context)
         if res.get('value', False) and part:
-            partner = self.pool.get('res.partner').browse(cr, uid, part)
+            partner = self.pool.get('res.partner').browse(cr, uid, part,
+                                                          context)
             for partner_agent in partner.commission_ids:
                 vals = {
                     'agent_id': partner_agent.agent_id.id,
@@ -115,7 +118,7 @@ class sale_order(orm.Model):
                 if ids:
                     for id in ids:
                         vals['sale_id'] = id
-                sale_agent_id = sale_order_agent.create(cr, uid, vals)
+                sale_agent_id = sale_order_agent.create(cr, uid, vals, context)
                 sale_agent_ids.append(int(sale_agent_id))
             res['value']['sale_agent_ids'] = sale_agent_ids
         return res
@@ -287,7 +290,8 @@ class sale_order_line(orm.Model):
                     cr, uid, [('line_id', 'in', ids)]))
                 res['value']['line_agent_ids'] = []
             if not product_obj.commission_exent:
-                order_comm_ids = [x[1] for x in sale_agent_ids if x[0] != 2]
+                order_comm_ids = [x[-1] for x in sale_agent_ids if x[0] != 2]
+                order_comm_ids = list(itertools.chain(*order_comm_ids))
                 order_agent_ids = [x.agent_id.id for x in self.pool.get(
                     "sale.order.agent").browse(cr, uid, order_comm_ids)]
                 dic = {}

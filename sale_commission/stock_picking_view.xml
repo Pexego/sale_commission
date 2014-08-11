@@ -8,7 +8,7 @@
             <field name="type">form</field>
             <field name="inherit_id" ref="stock.view_picking_form"/>
             <field name="arch" type="xml">
-                <field name="origin" position="after" >
+                <field name="priority" position="after" >
                     <group colspan="2" col="2">
                     <separator colspan="2" string="Agents/Consultancy"/>
                     <field name="agent_ids" colspan="2" rowspan="4" readonly="1" nolabel="1">
