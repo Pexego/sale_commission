@@ -479,8 +479,7 @@ class settlement_line (orm.Model):
                                                required=True, select=1,
                                                ondelete="cascade"),
         'invoice_line_id': fields.many2one('account.invoice.line',
-                                           'Settled invoice line',
-                                           required=True),
+                                           'Settled invoice line'),
         'amount': fields.float('Invoice line amount', readonly=True),
         'currency_id': fields.many2one('res.currency', 'Currency',
                                        readonly=True),
@@ -500,47 +499,48 @@ class settlement_line (orm.Model):
         amount = 0
         user = self.pool.get('res.users').browse(cr, uid, uid)
 
-        # Recorre los agentes y condiciones asignados a la factura
-        for commission in line.invoice_line_id.commission_ids:
-            # selecciona el asignado al agente para el que está liquidando
-            if commission.agent_id.id == line.settlement_agent_id.agent_id.id:
-                commission_app = commission.commission_id  # Obtiene el objeto
-                invoice_line_amount = line.invoice_line_id.price_subtotal
-                if commission_app.type == "fijo":
-                    commission_per = commission_app.fix_qty
-                    # Para tener en cuenta las rectificativas
-                    if line.invoice_line_id.invoice_id.type == 'out_refund':
-                        amount = amount - \
-                            line.invoice_line_id.price_subtotal * \
-                            float(commission_per) / 100
-                    else:
-                        amount = amount + \
-                            line.invoice_line_id.price_subtotal * \
-                            float(commission_per) / 100
+        if line.invoice_line_id:
+            # Recorre los agentes y condiciones asignados a la factura
+            for commission in line.invoice_line_id.commission_ids:
+                # selecciona el asignado al agente para el que está liquidando
+                if commission.agent_id.id == line.settlement_agent_id.agent_id.id:
+                    commission_app = commission.commission_id  # Obtiene el objeto
+                    invoice_line_amount = line.invoice_line_id.price_subtotal
+                    if commission_app.type == "fijo":
+                        commission_per = commission_app.fix_qty
+                        # Para tener en cuenta las rectificativas
+                        if line.invoice_line_id.invoice_id.type == 'out_refund':
+                            amount = amount - \
+                                line.invoice_line_id.price_subtotal * \
+                                float(commission_per) / 100
+                        else:
+                            amount = amount + \
+                                line.invoice_line_id.price_subtotal * \
+                                float(commission_per) / 100
 
-                elif commission_app.type == "tramos":
-                    invoice_line_amount = 0
-                    amount = 0
+                    elif commission_app.type == "tramos":
+                        invoice_line_amount = 0
+                        amount = 0
 
-                cc_amount_subtotal = line.invoice_id.currency_id.id != \
-                    user.company_id.currency_id.id and \
-                    currency_obj.compute(cr, uid,
-                                         line.invoice_id.currency_id.id,
-                                         user.company_id.currency_id.id,
-                                         invoice_line_amount,
-                                         round=False) or invoice_line_amount
-                cc_commission_amount = line.invoice_id.currency_id.id != \
-                    user.company_id.currency_id.id and \
-                    currency_obj.compute(cr, uid,
-                                         line.invoice_id.currency_id.id,
-                                         user.company_id.currency_id.id,
-                                         amount, round=False) or amount
+                    cc_amount_subtotal = line.invoice_id.currency_id.id != \
+                        user.company_id.currency_id.id and \
+                        currency_obj.compute(cr, uid,
+                                             line.invoice_id.currency_id.id,
+                                             user.company_id.currency_id.id,
+                                             invoice_line_amount,
+                                             round=False) or invoice_line_amount
+                    cc_commission_amount = line.invoice_id.currency_id.id != \
+                        user.company_id.currency_id.id and \
+                        currency_obj.compute(cr, uid,
+                                             line.invoice_id.currency_id.id,
+                                             user.company_id.currency_id.id,
+                                             amount, round=False) or amount
 
-                self.write(cr, uid, ids,
-                           {'amount': cc_amount_subtotal,
-                            'commission_id': commission_app.id,
-                            'commission': cc_commission_amount,
-                            'currency_id': user.company_id.currency_id.id})
+                    self.write(cr, uid, ids,
+                               {'amount': cc_amount_subtotal,
+                                'commission_id': commission_app.id,
+                                'commission': cc_commission_amount,
+                                'currency_id': user.company_id.currency_id.id})
 
 
 class settled_invoice_agent(orm.Model):
