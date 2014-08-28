@@ -67,6 +67,9 @@
                 <field name="move_id" position="after">
                     <field name="agent_id"/>
                 </field>
+                <xpath expr="//field[@name='invoice_line']/tree" position="attributes">
+                    <attribute name="editable" eval="False"/>
+                </xpath>
             </field>
         </record>
 
