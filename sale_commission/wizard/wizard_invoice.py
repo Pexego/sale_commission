@@ -35,7 +35,7 @@ class settled_invoice_wizard (orm.TransientModel):
         'mode': fields.selection([('line', 'for each invoice line settled'),
                                   ('invoice', 'for each sale invoice'),
                                   ('agent', 'summary for each agent')],
-                                 'A line', required=True),
+                                 'Invoice mode', required=True),
     }
     _defaults = {
     }

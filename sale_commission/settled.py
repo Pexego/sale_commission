@@ -116,7 +116,7 @@ class recalculate_commision_wizard(orm.TransientModel):
         }
 
 
-class settlement (orm.Model):
+class settlement(orm.Model):
     """Objeto Liquidación"""
 
     _name = 'settlement'
@@ -203,7 +203,7 @@ class settlement (orm.Model):
         return super(settlement, self).unlink(cr, uid, ids, context=context)
 
 
-class settlement_agent (orm.Model):
+class settlement_agent(orm.Model):
     """Liquidaciones de Agentes"""
 
     _name = 'settlement.agent'
@@ -213,7 +213,7 @@ class settlement_agent (orm.Model):
         '''Call after the creation of the invoice line'''
         return
 
-    def _invoice_hook(self, cursor, user, picking, invoice_id):
+    def _invoice_hook(self, cursor, user, ids, invoice_id):
         '''Call after the creation of the invoice'''
         return
 
@@ -232,7 +232,7 @@ class settlement_agent (orm.Model):
                                          required=True, ondelete="cascade")
     }
 
-    def get_currency_id(self, cursor, user, picking):
+    def get_currency_id(self, cursor, user, ids):
         return False
 
     def action_invoice_create(self, cursor, user, ids, journal_id,
@@ -246,11 +246,11 @@ class settlement_agent (orm.Model):
         for settlement in self.browse(cursor, user, ids, context=context):
             if (not settlement.total_sections) and (not settlement.total):
                 continue
-            payment_term_id = False
             partner = settlement.agent_id and settlement.agent_id.partner_id
             if not partner:
                 continue
 
+            payment_term_id = partner.property_supplier_payment_term.id
             # El tipo es de facura de proveedor
             account_id = partner.property_account_payable.id
 
@@ -258,7 +258,7 @@ class settlement_agent (orm.Model):
 
             invoice_vals = {
                 'name': settlement.settlement_id.name,
-                'origin': (settlement.settlement_id.name or ''),
+                'origin': settlement.settlement_id.name,
                 'type': 'in_invoice',
                 'account_id': account_id,
                 'partner_id': partner.id,
