@@ -48,25 +48,30 @@ class stock_picking(orm.Model):
             cr, uid, [line_agent_id])
         return line_agent_id
 
-    def _invoice_line_hook(self, cursor, user, move_line, invoice_line_id):
-        '''Call after the creation of the invoice line'''
-        super(stock_picking, self)._invoice_line_hook(cursor, user, move_line,
-                                                      invoice_line_id)
-        if move_line and move_line.sale_line_id and \
-                move_line.sale_line_id.product_id.commission_exent is not True:
-            line = move_line.sale_line_id
+    def action_invoice_create(self, cr, uid, ids, journal_id, group=False,
+                              type='out_invoice', context=None):
+        invoices = super(stock_picking, self).action_invoice_create(
+            cr, uid, ids, journal_id, group, type, context)
+        for picking in self.browse(cr, uid, ids, context):
+            for move_line in picking.move_lines:
+                if move_line and move_line.procurement_id and \
+                        move_line.procurement_id.sale_line_id and  \
+                        move_line.procurement_id.sale_line_id.product_id.commission_exent is not True:
+                    # line = move_line.sale_line_id
+                    line = move_line.procurement_id.sale_line_id
+                    for invoice_line in line.invoice_lines:
+                        # si la linea no tiene comisiones se arrastran los del
+                        # pedido a la linea de factura
+                        if not line.line_agent_ids:
+                            for so_comm in line.order_id.sale_agent_ids:
+                                line_agent_id = self._create_invoice_line_agent(
+                                    cr, uid, [], so_comm.agent_id.id,
+                                    so_comm.commission_id.id, invoice_line.id)
+                        else:
+                            for l_comm in line.line_agent_ids:
+                                line_agent_id = self._create_invoice_line_agent(
+                                    cr, uid, [],
+                                    l_comm.agent_id.id,
+                                    l_comm.commission_id.id, invoice_line.id)
 
-            # si la linea no tiene comisiones se arrastran los del
-            # pedido a la linea de factura
-            if not line.line_agent_ids:
-                for so_comm in line.order_id.sale_agent_ids:
-                    line_agent_id = self._create_invoice_line_agent(
-                        cursor, user, [], so_comm.agent_id.id,
-                        so_comm.commission_id.id, invoice_line_id)
-            else:
-                for l_comm in line.line_agent_ids:
-                    line_agent_id = self._create_invoice_line_agent(
-                        cursor, user, [],
-                        l_comm.agent_id.id,
-                        l_comm.commission_id.id, invoice_line_id)
-        return
+        return invoices
