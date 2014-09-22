@@ -573,7 +573,7 @@ class settled_invoice_agent(orm.Model):
 
         cr.execute("""
             create or replace view settled_invoice_agent as (
-            SELECT  (account_invoice_line.invoice_id*10000+settlement_agent.agent_id) as id, settlement_agent.id as settlement_agent_id,
+            SELECT  row_number() OVER () as id, settlement_agent.id as settlement_agent_id,
             account_invoice_line.invoice_id as invoice_id, settlement_agent.agent_id as agent_id, MAX(account_invoice.partner_id) as partner_id,
             sum(settlement_line.amount) as invoice_amount,
             sum(settlement_line.commission) as settled_amount
