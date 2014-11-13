@@ -105,8 +105,9 @@ class sale_order(orm.Model):
                                                           context)
         sale_order_agent = self.pool.get('sale.order.agent')
         if ids:
-            sale_order_agent.unlink(cr, uid, sale_order_agent.search(
-                cr, uid, [('sale_id', '=', ids)]), context=context)
+            so_agent_ids = sale_order_agent.search(cr, uid, [('sale_id', 'in', ids)])
+            for  agent in so_agent_ids:
+                sale_agent_ids.append((2, agent))
         if res.get('value', False) and part:
             partner = self.pool.get('res.partner').browse(cr, uid, part,
                                                           context)
@@ -118,9 +119,12 @@ class sale_order(orm.Model):
                 if ids:
                     for id in ids:
                         vals['sale_id'] = id
-                sale_agent_id = sale_order_agent.create(cr, uid, vals, context)
-                sale_agent_ids.append(int(sale_agent_id))
-            res['value']['sale_agent_ids'] = sale_agent_ids
+                #sale_agent_id = sale_order_agent.create(cr, uid, vals, context)
+                sale_agent_ids.append((0,0,vals))
+            if sale_agent_ids:
+                res['value']['sale_agent_ids'] = sale_agent_ids
+            else:
+                res['value']['sale_agent_ids'] = False
         return res
 
     def action_ship_create(self, cr, uid, ids, context=None):
@@ -137,7 +141,7 @@ class sale_order(orm.Model):
                                                          [[6, 0, agents]]})
         return res
 
-    def create(self, cr, uid, values, context=None):
+    '''def create(self, cr, uid, values, context=None):
         """
         Para que el cliente gtk no borre el agente al darle a guardar
         """
@@ -147,7 +151,7 @@ class sale_order(orm.Model):
                 self.pool.get('sale.order.agent').write(cr, uid,
                                                         sale_order_agent[1],
                                                         {'sale_id': res})
-        return res
+        return res'''
 
 
 class sale_line_agent(orm.Model):
