@@ -142,16 +142,8 @@ class sale_order(orm.Model):
         return res
 
     def create(self, cr, uid, values, context=None):
-        """
-        Para que el cliente gtk no borre el agente al darle a guardar
-        """
         context['sale_agent_ids'] = values.get('sale_agent_ids', False)
         res = super(sale_order, self).create(cr, uid, values, context=context)
-        '''if 'sale_agent_ids' in values:
-            for sale_order_agent in values['sale_agent_ids']:
-                self.pool.get('sale.order.agent').write(cr, uid,
-                                                        sale_order_agent[1],
-                                                        {'sale_id': res})'''
         return res
 
 
@@ -281,6 +273,7 @@ class sale_order_line(orm.Model):
                            date_order=False, packaging=False,
                            fiscal_position=False,
                            flag=False, sale_agent_ids=False, context=None):
+        order_agent_obj = self.pool.get("sale.order.agent")
         res = super(sale_order_line, self).product_id_change(
             cr, uid, ids, pricelist, product, qty, uom, qty_uos, uos, name,
             partner_id, lang, update_tax, date_order, packaging,
@@ -295,10 +288,20 @@ class sale_order_line(orm.Model):
                     cr, uid, [('line_id', 'in', ids)]))
                 res['value']['line_agent_ids'] = []
             if not product_obj.commission_exent:
-                order_comm_ids = [x[-1] for x in sale_agent_ids if x[0] != 2]
-                order_comm_ids = list(itertools.chain(*order_comm_ids))
-                order_agent_ids = [x.agent_id.id for x in self.pool.get(
-                    "sale.order.agent").browse(cr, uid, order_comm_ids)]
+                order_agent_ids = []
+                obj_list = []
+                for agent in sale_agent_ids:
+                    if type(agent[-1]) == type(obj_list):
+                        obj_list += agent[-1]
+                    else:
+                        obj_list.append(agent[-1])
+                for obj in obj_list:
+                    if not obj:
+                        continue
+                    if type(obj) == type({}):
+                        order_agent_ids.append(obj['agent_id'])
+                    else:
+                        order_agent_ids.append(order_agent_obj.browse(cr, uid, obj, context).agent_id.id)
                 dic = {}
                 for prod_record in product_obj.product_agent_ids:
                     # no hay agentes especificados para la comisión:
@@ -319,17 +322,3 @@ class sale_order_line(orm.Model):
                     list_agent_ids.append(int(line_agent_id))
                 res['value']['line_agent_ids'] = list_agent_ids
         return res
-
-    '''def create(self, cr, uid, values, context=None):
-        """
-            Para que el cliente gtk no borre el agente de la linea al darle a
-            guardar
-        """
-        res = super(sale_order_line, self).create(cr, uid, values,
-                                                  context=context)
-        if 'line_agent_ids' in values:
-            for sale_line_agent in values['line_agent_ids']:
-                self.pool.get('sale.line.agent').write(cr, uid,
-                                                       sale_line_agent[1],
-                                                       {'line_id': res})
-        return res'''
