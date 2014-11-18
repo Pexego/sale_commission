@@ -141,12 +141,13 @@ class sale_order(orm.Model):
         """
         Para que el cliente gtk no borre el agente al darle a guardar
         """
+        context['sale_agent_ids'] = values.get('sale_agent_ids', False)
         res = super(sale_order, self).create(cr, uid, values, context=context)
-        if 'sale_agent_ids' in values:
+        '''if 'sale_agent_ids' in values:
             for sale_order_agent in values['sale_agent_ids']:
                 self.pool.get('sale.order.agent').write(cr, uid,
                                                         sale_order_agent[1],
-                                                        {'sale_id': res})
+                                                        {'sale_id': res})'''
         return res
 
 
@@ -315,7 +316,7 @@ class sale_order_line(orm.Model):
                 res['value']['line_agent_ids'] = list_agent_ids
         return res
 
-    def create(self, cr, uid, values, context=None):
+    '''def create(self, cr, uid, values, context=None):
         """
             Para que el cliente gtk no borre el agente de la linea al darle a
             guardar
@@ -327,4 +328,4 @@ class sale_order_line(orm.Model):
                 self.pool.get('sale.line.agent').write(cr, uid,
                                                        sale_line_agent[1],
                                                        {'line_id': res})
-        return res
+        return res'''
