@@ -20,20 +20,12 @@
 #
 ##############################################################################
 
-"""Add a new property for early payment discount account by default"""
+"""Módulo que introduce la funcionalidad de pronto pago en las ventas"""
 
-from osv import osv, fields
-
-class product_category(osv.osv):
-    """Add a new property for early payment discount account by default"""
-
-    _inherit = 'product.category'
-
-    _columns = {
-        'property_account_sale_early_payment_disc': fields.property('account.account',
-            type='many2one', relation='account.account',
-            string='Sale early payment account', method=True, view_load=True,
-            help='This account will be used to input the early payments discount in sale')
-    }
-
-product_category()
+from . import product_category
+from . import partner_payment_term_early_discount
+from . import partner
+from . import payment_term
+from . import sale
+from . import account_invoice
+from . import stock_picking

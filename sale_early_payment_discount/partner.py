@@ -20,12 +20,15 @@
 #
 ##############################################################################
 
-"""Módulo que introduce la funcionalidad de pronto pago en las ventas"""
+from openerp import models, fields
 
-import product_category
-import partner_payment_term_early_discount
-import partner
-import payment_term
-import sale
-import account_invoice
-import stock_picking
+
+class res_partner(models.Model):
+    """Objeto que une las empresas con plazos de pago y descuentos pronto
+       pago"""
+
+    _inherit = "res.partner"
+
+    early_payment_discount_ids = fields.One2many(
+        'account.partner.payment.term.early.discount', 'partner_id',
+        'E.P. discounts')

@@ -12,9 +12,9 @@
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="type">form</field>
             <field name="arch" type="xml">
-                <xpath expr="/form/notebook/page[@string='Invoice']/group[@col='4']/label[@colspan='2']" position="replace">
+                <header position="inside">
                     <button colspan="2" name="button_compute_early_payment_disc" states="draft" string="Apply early payment disc." type="object" groups="base.group_user" />
-                </xpath>
+                </header>
             </field>
         </record>
 
@@ -26,7 +26,7 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <field name="payment_term" position="replace">
-                    <field name="payment_term" on_change="onchange_payment_term(payment_term,partner_id)"/>
+                    <field name="payment_term"/>
                     <field name="early_payment_discount"/>
                     <field name="early_discount_amount"/>
                 </field>

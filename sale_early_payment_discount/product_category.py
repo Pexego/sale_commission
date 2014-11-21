@@ -19,16 +19,15 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+from openerp import models, fields
 
-from osv import osv, fields
 
-class payment_term(osv.osv):
-    """Objeto que une las empresas con plazos de pago y descuentos pronto pago"""
+class product_category(models.Model):
+    """Add a new property for early payment discount account by default"""
 
-    _inherit = "account.payment.term"
+    _inherit = 'product.category'
 
-    _columns = {
-        'early_payment_discount_ids': fields.one2many('account.partner.payment.term.early.discount', 'payment_term_id', 'E.P. discounts')
-    }
-
-payment_term()
+    property_account_sale_early_payment_disc = fields.Many2one(
+        'account.account', 'Sale early payment account',
+        help='This account will be used to input the early payments discount \
+             in sale', company_dependent=True)
