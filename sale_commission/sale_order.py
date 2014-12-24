@@ -272,12 +272,12 @@ class sale_order_line(orm.Model):
                            partner_id=False, lang=False, update_tax=True,
                            date_order=False, packaging=False,
                            fiscal_position=False,
-                           flag=False, sale_agent_ids=False, context=None):
+                           flag=False, warehouse_id=False, sale_agent_ids=False, context=None):
         order_agent_obj = self.pool.get("sale.order.agent")
-        res = super(sale_order_line, self).product_id_change(
+        res = super(sale_order_line, self).product_id_change_with_wh(
             cr, uid, ids, pricelist, product, qty, uom, qty_uos, uos, name,
             partner_id, lang, update_tax, date_order, packaging,
-            fiscal_position, flag, context)
+            fiscal_position, flag, warehouse_id, context)
         if product:
             list_agent_ids = []
             product_obj = self.pool.get("product.product").browse(cr, uid,
