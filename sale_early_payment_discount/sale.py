@@ -99,13 +99,14 @@ class sale_order(models.Model):
 
         return {'value': res}
 
-    @api.one
-    def action_invoice_create(self, grouped=False, states=['confirmed', 'done', 'exception'], date_inv=False):
+    @api.multi
+    def action_invoice_create(self, grouped=False, states=['confirmed', 'done', 'exception'], date_invoice=False):
         """
         Inherited method for writing early_payment_discount value in created invoice
         """
-        invoice_id = super(sale_order, self).action_invoice_create(grouped=grouped, states=states, date_inv = date_inv)
-        invoice_facade = self.env['account.invoice']
-        if self.early_payment_discount:
-            invoice_facade.write(cr, uid, invoice_id, {'early_payment_discount': self.early_payment_discount})
+        invoice_id = super(sale_order, self).action_invoice_create(grouped=grouped, states=states, date_invoice = date_invoice)
+        invoice = self.env['account.invoice'].browse(invoice_id)
+        current_sale = self and self[0] or False
+        if current_sale.early_payment_discount:
+            invoice.write({'early_payment_discount': current_sale.early_payment_discount})
         return invoice_id
