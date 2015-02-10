@@ -137,7 +137,7 @@ class account_invoice(orm.Model):
                                   string='Country', relation='res.country'),
     }
 
-    def onchange_partner_id(self, cr, uid, ids, type, part,
+    def onchange_partner_id(self, cr, uid, ids, type, partner_id,
                             date_invoice=False, payment_term=False,
                             partner_bank_id=False, company_id=False):
         """
@@ -145,12 +145,12 @@ class account_invoice(orm.Model):
             la empresa
         """
         res = super(account_invoice, self).onchange_partner_id(
-            cr, uid, ids, type, part, date_invoice=date_invoice,
+            cr, uid, ids, type, partner_id, date_invoice=date_invoice,
             payment_term=payment_term, partner_bank_id=partner_bank_id,
             company_id=company_id)
 
-        if part and res.get('value', False):
-            partner = self.pool.get('res.partner').browse(cr, uid, part)
+        if partner_id and res.get('value', False):
+            partner = self.pool.get('res.partner').browse(cr, uid, partner_id)
             if partner.commission_ids:
                 res['value']['agent_id'] = partner.commission_ids[0].agent_id.id
 
