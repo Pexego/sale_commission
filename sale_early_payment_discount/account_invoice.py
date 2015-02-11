@@ -160,7 +160,7 @@ class account_invoice(models.Model):
 
             for invoice_line in self.invoice_line:
                 if invoice_line.product_id.id == early_payment.id:
-                    orig_early_payment_lines.append(invoice_line.id)
+                    orig_early_payment_lines += invoice_line
 
             if orig_early_payment_lines:
                 #delete old early payment lines
