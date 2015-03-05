@@ -9,7 +9,7 @@
         <record id="invoice_form_add_early_payment_button" model="ir.ui.view">
             <field name="name">account.invoice.form_add_early_payment_button</field>
             <field name="model">account.invoice</field>
-            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="inherit_id" ref="nan_account_extension.invoice_form_payment_term_onchange"/>
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <xpath expr="/form/notebook/page[@string='Invoice']/group[@col='4']/label[@colspan='2']" position="replace">
@@ -26,9 +26,22 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <field name="payment_term" position="replace">
-                    <field name="payment_term" on_change="onchange_payment_term(payment_term,partner_id)"/>
+                    <field name="payment_term" on_change="onchange_payment_term(payment_term, partner_id)"/>
                     <field name="early_payment_discount"/>
                     <field name="early_discount_amount"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="invoice_supplier_form_payment_term_onchange" model="ir.ui.view">
+            <field name="name">account.invoice.form_add_early_payment_discount</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="nan_account_extension.invoice_supplier_form_payment_term_onchange"/>
+            <field name="priority" eval="2"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <field name="payment_term" position="replace">
+                    <field name="payment_term" on_change="onchange_payment_term(payment_term, partner_id)"/>
                 </field>
             </field>
         </record>
