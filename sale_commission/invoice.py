@@ -23,6 +23,7 @@
 
 from openerp.osv import fields, orm
 from openerp.tools.translate import _
+from openerp import api
 
 
 class invoice_line_agent(orm.Model):
@@ -158,21 +159,21 @@ class account_invoice(orm.Model):
 
         return res
 
-    def _refund_cleanup_lines(self, cr, uid, lines):
+    @api.model
+    def _refund_cleanup_lines(self, lines):
         """
             ugly function to map all fields of account.invoice.line when
             creates refund invoice
         """
-        res = super(account_invoice, self)._refund_cleanup_lines(cr, uid,
-                                                                 lines)
+        res = super(account_invoice, self)._refund_cleanup_lines(lines)
         # import ipdb; ipdb.set_trace()
         for line in res:
             if 'commission_ids' in line[2]:
                 duply_ids = []
                 for cm_id in line[2].get('commission_ids', []):
-                    dup_id = self.pool.get("invoice.line.agent").copy(
-                        cr, uid, cm_id, {'settled': False})
-                    duply_ids.append(dup_id)
+                    dup_id = self.env["invoice.line.agent"].copy(
+                        cm_id, {'settled': False})
+                    duply_ids.append(dup_id.id)
                 line[2]['commission_ids'] = [(6, 0, duply_ids)]
 
         return res
