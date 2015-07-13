@@ -142,6 +142,10 @@ class sale_order(orm.Model):
         return res
 
     def create(self, cr, uid, values, context=None):
+        if not context:
+            context = {}
+        else:
+            context = dict(context)
         context['sale_agent_ids'] = values.get('sale_agent_ids', False)
         res = super(sale_order, self).create(cr, uid, values, context=context)
         return res
