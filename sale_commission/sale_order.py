@@ -53,6 +53,7 @@ class sale_order_agent(orm.Model):
         """al cambiar el agente cargamos sus comisión"""
         result = {}
         v = {}
+        import ipdb; ipdb.set_trace()
         if agent_id:
             agent = self.pool.get('sale.agent').browse(cr, uid, agent_id)
             v['commission_id'] = agent.commission.id
@@ -120,7 +121,7 @@ class sale_order(orm.Model):
                     for id in ids:
                         vals['sale_id'] = id
                 #sale_agent_id = sale_order_agent.create(cr, uid, vals, context)
-                sale_agent_ids.append((0,0,vals))
+                sale_agent_ids.append((0, 0, vals))
             if sale_agent_ids:
                 res['value']['sale_agent_ids'] = sale_agent_ids
             else:
@@ -134,7 +135,7 @@ class sale_order(orm.Model):
 
         for order in self.browse(cr, uid, ids):
             pickings = [x.id for x in order.picking_ids]
-            agents = [x.agent_id.id for x in order.sale_agent_ids]
+            agents = list(set([x.agent_id.id for x in order.sale_agent_ids]))
             if pickings and agents:
                 self.pool.get('stock.picking').write(cr, uid, pickings,
                                                      {'agent_ids':
