@@ -142,6 +142,7 @@ class sale_order(orm.Model):
         return res
 
     def create(self, cr, uid, values, context=None):
+        context = dict(context)
         context['sale_agent_ids'] = values.get('sale_agent_ids', False)
         res = super(sale_order, self).create(cr, uid, values, context=context)
         return res
@@ -291,7 +292,7 @@ class sale_order_line(orm.Model):
             if not product_obj.commission_exent:
                 order_agent_ids = []
                 obj_list = []
-                for agent in context.get('sale_agent_ids', False):
+                for agent in context.get('sale_agent_ids', []):
                     if type(agent[-1]) == type(obj_list):
                         obj_list += agent[-1]
                     else:
