@@ -267,12 +267,13 @@ class sale_order_line(orm.Model):
             vals['line_id'] = ids[0]
         return sale_line_agent.create(cr, uid, vals)
 
-    def product_id_change2(self, cr, uid, ids, pricelist, product, qty=0,
-                           uom=False, qty_uos=0, uos=False, name='',
-                           partner_id=False, lang=False, update_tax=True,
-                           date_order=False, packaging=False,
-                           fiscal_position=False,
-                           flag=False, warehouse_id=False, sale_agent_ids=False, context=None):
+    def product_id_change_with_wh(self, cr, uid, ids, pricelist, product,
+                                  qty=0, uom=False, qty_uos=0, uos=False,
+                                  name='', partner_id=False, lang=False,
+                                  update_tax=True, date_order=False,
+                                  packaging=False, fiscal_position=False,
+                                  flag=False, warehouse_id=False,
+                                  context=None):
         order_agent_obj = self.pool.get("sale.order.agent")
         res = super(sale_order_line, self).product_id_change_with_wh(
             cr, uid, ids, pricelist, product, qty, uom, qty_uos, uos, name,
@@ -290,7 +291,7 @@ class sale_order_line(orm.Model):
             if not product_obj.commission_exent:
                 order_agent_ids = []
                 obj_list = []
-                for agent in sale_agent_ids:
+                for agent in context.get('sale_agent_ids', False):
                     if type(agent[-1]) == type(obj_list):
                         obj_list += agent[-1]
                     else:
