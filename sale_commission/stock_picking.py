@@ -75,3 +75,15 @@ class stock_picking(orm.Model):
                                     l_comm.commission_id.id, invoice_line.id)
 
         return invoices
+
+    def _create_invoice_from_picking(self, cr, uid, picking, vals,
+                                     context=None):
+        '''
+            Para linkear bien la factura a los envios parciales
+        '''
+        invoice_id = super(stock_picking, self)._create_invoice_from_picking(
+            cr, uid, picking, vals, context=context)
+        agent_id = picking.agent_ids and picking.agent_ids[0].id or False
+        self.pool.get("account.invoice").write(cr, uid, [invoice_id],
+                                               {'agent_id': agent_id})
+        return invoice_id
