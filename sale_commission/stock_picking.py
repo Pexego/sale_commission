@@ -34,47 +34,17 @@ class stock_picking(orm.Model):
                                       'agent_id', 'clinic_id', 'Agentes')
     }
 
-    def _create_invoice_line_agent(self, cr, uid, ids, agent_id, commission_id,
-                                   invoice_line_id):
+    def _create_invoice_line_agent(self, cr, uid, ids, agent_id, commission_id):
         vals = {
             'agent_id': agent_id,
             'commission_id': commission_id,
-            'settled': False,
-            'invoice_line_id': invoice_line_id
+            'settled': False
         }
         line_agent_id = self.pool.get('invoice.line.agent').create(cr, uid,
                                                                    vals)
         self.pool.get('invoice.line.agent').calculate_commission(
             cr, uid, [line_agent_id])
         return line_agent_id
-
-    def action_invoice_create(self, cr, uid, ids, journal_id, group=False,
-                              type='out_invoice', context=None):
-        invoices = super(stock_picking, self).action_invoice_create(
-            cr, uid, ids, journal_id, group, type, context)
-        for picking in self.browse(cr, uid, ids, context):
-            for move_line in picking.move_lines:
-                if move_line and move_line.procurement_id and \
-                        move_line.procurement_id.sale_line_id and  \
-                        move_line.procurement_id.sale_line_id.product_id.commission_exent is not True:
-                    # line = move_line.sale_line_id
-                    line = move_line.procurement_id.sale_line_id
-                    for invoice_line in line.invoice_lines:
-                        # si la linea no tiene comisiones se arrastran los del
-                        # pedido a la linea de factura
-                        if not line.line_agent_ids:
-                            for so_comm in line.order_id.sale_agent_ids:
-                                line_agent_id = self._create_invoice_line_agent(
-                                    cr, uid, [], so_comm.agent_id.id,
-                                    so_comm.commission_id.id, invoice_line.id)
-                        else:
-                            for l_comm in line.line_agent_ids:
-                                line_agent_id = self._create_invoice_line_agent(
-                                    cr, uid, [],
-                                    l_comm.agent_id.id,
-                                    l_comm.commission_id.id, invoice_line.id)
-
-        return invoices
 
     def _create_invoice_from_picking(self, cr, uid, picking, vals,
                                      context=None):
@@ -87,3 +57,35 @@ class stock_picking(orm.Model):
         self.pool.get("account.invoice").write(cr, uid, [invoice_id],
                                                {'agent_id': agent_id})
         return invoice_id
+
+
+class StockMove(orm.Model):
+
+    _inherit = "stock.move"
+
+    def _get_invoice_line_vals(self, cr, uid, move, partner, inv_type,
+                               context=None):
+        res = super(StockMove, self).\
+            _get_invoice_line_vals(cr, uid, move, partner, inv_type,
+                                   context=context)
+        list_ids = []
+        if move.procurement_id.sale_line_id and not \
+                move.procurement_id.sale_line_id.product_id.commission_exent:
+            line = move.procurement_id.sale_line_id
+            if not line.line_agent_ids:
+                for so_comm in line.order_id.sale_agent_ids:
+                    line_agent_id = self.pool['stock.picking'].\
+                        _create_invoice_line_agent(cr, uid, [],
+                                                   so_comm.agent_id.id,
+                                                   so_comm.commission_id.id)
+                    list_ids.append(line_agent_id)
+
+            else:
+                for l_comm in line.line_agent_ids:
+                    line_agent_id = self.pool['stock.picking'].\
+                        _create_invoice_line_agent(cr, uid, [],
+                                                   l_comm.agent_id.id,
+                                                   l_comm.commission_id.id)
+                    list_ids.append(line_agent_id)
+        res['commission_ids'] = [(6, 0, list_ids)]
+        return res
